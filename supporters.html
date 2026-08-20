@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Find Support | InterConnect</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- NAVBAR -->
+
+    <nav class="dashboard-nav">
+
+        <a href="index.html" class="dashboard-logo">
+            <span class="logo-icon">◎</span>
+            InterConnect
+        </a>
+
+        <div class="dashboard-nav-links">
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="supporters.html" class="active">
+                Find Support
+            </a>
+
+            <a href="messages.html">
+                Messages
+            </a>
+
+            <a href="profile.html">
+                Profile
+            </a>
+
+        </div>
+
+        <button id="logoutBtn" class="logout-btn">
+            Logout
+        </button>
+
+    </nav>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="supporters-container">
+
+        <section class="supporters-heading">
+
+            <p class="small-title">
+                INTERCONNECT SUPPORT
+            </p>
+
+            <h1>
+                Find someone who can help.
+            </h1>
+
+            <p>
+                Explore available supporters and connect with someone
+                who matches what you're looking for.
+            </p>
+
+        </section>
+
+
+        <!-- FILTERS -->
+
+        <section class="support-filters">
+
+            <div>
+                <label for="supportType">
+                    Support type
+                </label>
+
+                <select id="supportType">
+                    <option value="all">All support</option>
+                    <option value="psychology">Psychology Student</option>
+                    <option value="peer">Peer Supporter</option>
+                    <option value="professional">Professional Support</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="availability">
+                    Availability
+                </label>
+
+                <select id="availability">
+                    <option value="all">Any availability</option>
+                    <option value="available">Available now</option>
+                </select>
+            </div>
+
+        </section>
+
+
+        <!-- SUPPORTER CARDS -->
+
+        <section class="supporters-grid">
+
+
+            <!-- SUPPORTER 1 -->
+
+            <div class="supporter-profile-card"
+                 data-type="psychology"
+                 data-available="available">
+
+                <div class="profile-top">
+
+                    <div class="large-avatar">
+                        A
+                    </div>
+
+                    <span class="available-badge">
+                        ● Available
+                    </span>
+
+                </div>
+
+                <h2>
+                    Ananya Sharma
+                </h2>
+
+                <p class="supporter-role">
+                    Psychology Student
+                </p>
+
+                <p class="supporter-description">
+                    Interested in helping students dealing with
+                    academic pressure, stress and everyday challenges.
+                </p>
+
+                <div class="support-tags">
+
+                    <span>Academic Stress</span>
+                    <span>Study Pressure</span>
+                    <span>Peer Support</span>
+
+                </div>
+
+                <button class="connect-btn">
+                    Connect →
+                </button>
+
+            </div>
+
+
+            <!-- SUPPORTER 2 -->
+
+            <div class="supporter-profile-card"
+                 data-type="peer"
+                 data-available="available">
+
+                <div class="profile-top">
+
+                    <div class="large-avatar">
+                        R
+                    </div>
+
+                    <span class="available-badge">
+                        ● Available
+                    </span>
+
+                </div>
+
+                <h2>
+                    Rahul Mehta
+                </h2>
+
+                <p class="supporter-role">
+                    Trained Peer Supporter
+                </p>
+
+                <p class="supporter-description">
+                    Provides a friendly space for people who simply
+                    need someone to listen and understand.
+                </p>
+
+                <div class="support-tags">
+
+                    <span>Loneliness</span>
+                    <span>Relationships</span>
+                    <span>Someone to Talk To</span>
+
+                </div>
+
+                <button class="connect-btn">
+                    Connect →
+                </button>
+
+            </div>
+
+
+            <!-- SUPPORTER 3 -->
+
+            <div class="supporter-profile-card"
+                 data-type="psychology"
+                 data-available="available">
+
+                <div class="profile-top">
+
+                    <div class="large-avatar">
+                        S
+                    </div>
+
+                    <span class="available-badge">
+                        ● Available
+                    </span>
+
+                </div>
+
+                <h2>
+                    Sara Khan
+                </h2>
+
+                <p class="supporter-role">
+                    Psychology Graduate
+                </p>
+
+                <p class="supporter-description">
+                    Interested in supporting young people with
+                    confidence, career confusion and personal growth.
+                </p>
+
+                <div class="support-tags">
+
+                    <span>Self-confidence</span>
+                    <span>Career</span>
+                    <span>Personal Growth</span>
+
+                </div>
+
+                <button class="connect-btn">
+                    Connect →
+                </button>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        /* LOGOUT */
+
+        document.getElementById("logoutBtn")
+            .addEventListener("click", function () {
+
+                localStorage.removeItem("interconnectUser");
+
+                window.location.href = "login.html";
+
+            });
+
+
+        /* FILTER SUPPORTERS */
+
+        const supportType =
+            document.getElementById("supportType");
+
+        const availability =
+            document.getElementById("availability");
+
+        const supporterCards =
+            document.querySelectorAll(".supporter-profile-card");
+
+
+        function filterSupporters() {
+
+            const selectedType = supportType.value;
+            const selectedAvailability = availability.value;
+
+            supporterCards.forEach(function(card) {
+
+                const cardType = card.dataset.type;
+                const cardAvailability = card.dataset.available;
+
+                const typeMatch =
+                    selectedType === "all" ||
+                    selectedType === cardType;
+
+                const availabilityMatch =
+                    selectedAvailability === "all" ||
+                    selectedAvailability === cardAvailability;
+
+                if (typeMatch && availabilityMatch) {
+
+                    card.style.display = "block";
+
+                } else {
+
+                    card.style.display = "none";
+
+                }
+
+            });
+
+        }
+
+
+        supportType.addEventListener(
+            "change",
+            filterSupporters
+        );
+
+        availability.addEventListener(
+            "change",
+            filterSupporters
+        );
+
+
+        /* CONNECT BUTTONS */
+
+        document.querySelectorAll(".connect-btn")
+            .forEach(function(button) {
+
+                button.addEventListener("click", function() {
+
+                    const card =
+                        button.closest(".supporter-profile-card");
+
+                    const name =
+                        card.querySelector("h2").textContent;
+
+                    alert(
+                        "Connection request sent to " +
+                        name.trim() +
+                        "!"
+                    );
+
+                });
+
+            });
+
+    </script>
+
+</body>
+</html>

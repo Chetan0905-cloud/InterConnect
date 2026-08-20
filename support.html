@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Support | InterConnect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="support-page">
+
+    <!-- NAVBAR -->
+
+    <nav class="dashboard-nav">
+
+        <a href="dashboard.html" class="dashboard-logo">
+            <span class="logo-icon">◎</span>
+            InterConnect
+        </a>
+
+        <div class="dashboard-nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="support.html" class="active">Get Support</a>
+            <a href="#">Messages</a>
+            <a href="#">Profile</a>
+        </div>
+
+        <button id="logoutBtn" class="logout-btn">
+            Logout
+        </button>
+
+    </nav>
+
+
+    <!-- SUPPORT ASSESSMENT -->
+
+    <main class="support-container">
+
+        <div class="support-header">
+
+            <p class="small-title">
+                INTERCONNECT SUPPORT
+            </p>
+
+            <h1>
+                Tell us what's going on.
+            </h1>
+
+            <p>
+                You don't have to explain everything perfectly.
+                Share what's been on your mind and we'll help
+                you find suitable support.
+            </p>
+
+        </div>
+
+
+        <form id="supportForm" class="support-form">
+
+
+            <!-- MAIN CONCERN -->
+
+            <div class="support-question">
+
+                <label for="mainConcern">
+                    What's bothering you right now?
+                </label>
+
+                <p class="question-help">
+                    Describe what's been on your mind in your own words.
+                </p>
+
+                <textarea
+                    id="mainConcern"
+                    rows="5"
+                    placeholder="For example: I've been feeling stressed about my studies and finding it difficult to concentrate..."
+                    required>
+                </textarea>
+
+            </div>
+
+
+            <!-- CONCERN CATEGORY -->
+
+            <div class="support-question">
+
+                <label>
+                    What are you experiencing?
+                </label>
+
+                <p class="question-help">
+                    You can select more than one.
+                </p>
+
+                <div class="support-options">
+
+                    <label class="support-option">
+                        <input type="checkbox" name="concern"
+                               value="academic_stress">
+                        <span>📚 Academic / Study Stress</span>
+                    </label>
+
+                    <label class="support-option">
+                        <input type="checkbox" name="concern"
+                               value="anxiety">
+                        <span>🧠 Anxiety / Overthinking</span>
+                    </label>
+
+                    <label class="support-option">
+                        <input type="checkbox" name="concern"
+                               value="loneliness">
+                        <span>🤝 Loneliness</span>
+                    </label>
+
+                    <label class="support-option">
+                        <input type="checkbox" name="concern"
+                               value="relationship">
+                        <span>💬 Relationship Concerns</span>
+                    </label>
+
+                    <label class="support-option">
+                        <input type="checkbox" name="concern"
+                               value="career">
+                        <span>🎯 Career Confusion</span>
+                    </label>
+
+                    <label class="support-option">
+                        <input type="checkbox" name="concern"
+                               value="family">
+                        <span>🏠 Family Concerns</span>
+                    </label>
+
+                    <label class="support-option">
+                        <input type="checkbox" name="concern"
+                               value="self_confidence">
+                        <span>🌱 Self-confidence</span>
+                    </label>
+
+                    <label class="support-option">
+                        <input type="checkbox" name="concern"
+                               value="other">
+                        <span>✨ Something Else</span>
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- IMPACT -->
+
+            <div class="support-question">
+
+                <label for="impact">
+                    How is this affecting you?
+                </label>
+
+                <textarea
+                    id="impact"
+                    rows="4"
+                    placeholder="For example: It's affecting my sleep, concentration or motivation...">
+                </textarea>
+
+            </div>
+
+
+            <!-- INTENSITY -->
+
+            <div class="support-question">
+
+                <label>
+                    How intense does it feel right now?
+                </label>
+
+                <div class="support-options">
+
+                    <label class="support-option">
+                        <input type="radio"
+                               name="intensity"
+                               value="mild"
+                               required>
+                        <span>🙂 Mild</span>
+                    </label>
+
+                    <label class="support-option">
+                        <input type="radio"
+                               name="intensity"
+                               value="moderate">
+                        <span>😐 Moderate</span>
+                    </label>
+
+                    <label class="support-option">
+                        <input type="radio"
+                               name="intensity"
+                               value="high">
+                        <span>😟 High</span>
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- PREFERRED SUPPORT -->
+
+            <div class="support-question">
+
+                <label>
+                    What kind of support would you prefer?
+                </label>
+
+                <div class="support-options">
+
+                    <label class="support-option">
+                        <input type="radio"
+                               name="supportPreference"
+                               value="peer"
+                               required>
+                        <span>🗣️ Someone to talk to</span>
+                    </label>
+
+                    <label class="support-option">
+                        <input type="radio"
+                               name="supportPreference"
+                               value="psychology_student">
+                        <span>🧠 Psychology Student / Peer Supporter</span>
+                    </label>
+
+                    <label class="support-option">
+                        <input type="radio"
+                               name="supportPreference"
+                               value="professional">
+                        <span>👩‍⚕️ Professional Support</span>
+                    </label>
+
+                    <label class="support-option">
+                        <input type="radio"
+                               name="supportPreference"
+                               value="unsure">
+                        <span>🤷 I'm Not Sure</span>
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- SUBMIT -->
+
+            <div class="support-submit">
+
+                <button type="submit" class="dashboard-btn">
+                    Find My Support →
+                </button>
+
+                <p>
+                    Your responses will be used to personalize
+                    your support recommendations.
+                </p>
+
+            </div>
+
+        </form>
+
+    </main>
+
+
+    <script>
+
+        const supportForm =
+            document.getElementById("supportForm");
+
+
+        supportForm.addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+
+            const concerns =
+                Array.from(
+                    document.querySelectorAll(
+                        'input[name="concern"]:checked'
+                    )
+                ).map(input => input.value);
+
+
+            const intensity =
+                document.querySelector(
+                    'input[name="intensity"]:checked'
+                )?.value;
+
+
+            const supportPreference =
+                document.querySelector(
+                    'input[name="supportPreference"]:checked'
+                )?.value;
+
+
+            const supportData = {
+
+                mainConcern:
+                    document.getElementById("mainConcern").value,
+
+                concerns: concerns,
+
+                impact:
+                    document.getElementById("impact").value,
+
+                intensity: intensity,
+
+                supportPreference:
+                    supportPreference
+
+            };
+
+
+            localStorage.setItem(
+                "interconnectSupport",
+                JSON.stringify(supportData)
+            );
+
+
+            window.location.href =
+                "recommendations.html";
+
+        });
+
+
+        /* LOGOUT */
+
+        document.getElementById("logoutBtn")
+            .addEventListener("click", function() {
+
+                localStorage.removeItem(
+                    "interconnectUser"
+                );
+
+                localStorage.removeItem(
+                    "interconnectSupport"
+                );
+
+                window.location.href =
+                    "login.html";
+
+            });
+
+    </script>
+
+</body>
+</html>

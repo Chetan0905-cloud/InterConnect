@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Messages | InterConnect</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- NAVBAR -->
+
+    <nav class="dashboard-nav">
+
+        <a href="index.html" class="dashboard-logo">
+            <span class="logo-icon">◎</span>
+            InterConnect
+        </a>
+
+        <div class="dashboard-nav-links">
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="supporters.html">
+                Find Support
+            </a>
+
+            <a href="messages.html" class="active">
+                Messages
+            </a>
+
+            <a href="profile.html">
+                Profile
+            </a>
+
+        </div>
+
+        <button id="logoutBtn" class="logout-btn">
+            Logout
+        </button>
+
+    </nav>
+
+
+    <!-- MESSAGES -->
+
+    <main class="messages-container">
+
+        <section class="messages-header">
+
+            <p class="small-title">
+                INTERCONNECT MESSAGES
+            </p>
+
+            <h1>
+                Your conversations
+            </h1>
+
+            <p>
+                Connect, talk and take things at your own pace.
+            </p>
+
+        </section>
+
+
+        <section class="messages-layout">
+
+            <!-- CONVERSATIONS -->
+
+            <aside class="conversation-panel">
+
+                <div class="conversation-heading">
+                    <h2>Conversations</h2>
+                    <span>2</span>
+                </div>
+
+
+                <div class="conversation active-conversation"
+                     data-name="Ananya Sharma"
+                     data-role="Psychology Student">
+
+                    <div class="conversation-avatar">
+                        A
+                    </div>
+
+                    <div class="conversation-info">
+
+                        <h3>Ananya Sharma</h3>
+
+                        <p>
+                            Psychology Student
+                        </p>
+
+                        <span>
+                            I'm here if you need to talk.
+                        </span>
+
+                    </div>
+
+                    <div class="online-dot"></div>
+
+                </div>
+
+
+                <div class="conversation"
+                     data-name="Rahul Mehta"
+                     data-role="Trained Peer Supporter">
+
+                    <div class="conversation-avatar">
+                        R
+                    </div>
+
+                    <div class="conversation-info">
+
+                        <h3>Rahul Mehta</h3>
+
+                        <p>
+                            Trained Peer Supporter
+                        </p>
+
+                        <span>
+                            Take your time.
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+
+            <!-- CHAT -->
+
+            <section class="chat-panel">
+
+                <div class="chat-header">
+
+                    <div class="chat-person">
+
+                        <div class="conversation-avatar">
+                            A
+                        </div>
+
+                        <div>
+                            <h2 id="chatName">
+                                Ananya Sharma
+                            </h2>
+
+                            <p id="chatRole">
+                                🟢 Online · Psychology Student
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="chat-messages" id="chatMessages">
+
+                    <div class="message received">
+
+                        <p>
+                            Hi! I'm Ananya. It's nice to connect with you.
+                        </p>
+
+                        <span>
+                            10:32 AM
+                        </span>
+
+                    </div>
+
+
+                    <div class="message received">
+
+                        <p>
+                            You can share whatever you're comfortable
+                            talking about. There's no pressure.
+                        </p>
+
+                        <span>
+                            10:33 AM
+                        </span>
+
+                    </div>
+
+
+                    <div class="message sent">
+
+                        <p>
+                            Thank you. I just wanted someone to talk to.
+                        </p>
+
+                        <span>
+                            10:35 AM
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- MESSAGE INPUT -->
+
+                <form class="message-input-area" id="messageForm">
+
+                    <input
+                        type="text"
+                        id="messageInput"
+                        placeholder="Write a message..."
+                        autocomplete="off"
+                    >
+
+                    <button type="submit">
+                        Send →
+                    </button>
+
+                </form>
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        /* LOGOUT */
+
+        document.getElementById("logoutBtn")
+            .addEventListener("click", function () {
+
+                localStorage.removeItem("interconnectUser");
+
+                window.location.href = "login.html";
+
+            });
+
+
+        /* CONVERSATION SWITCHING */
+
+        const conversations =
+            document.querySelectorAll(".conversation");
+
+        const chatName =
+            document.getElementById("chatName");
+
+        const chatRole =
+            document.getElementById("chatRole");
+
+
+        conversations.forEach(function(conversation) {
+
+            conversation.addEventListener("click", function() {
+
+                conversations.forEach(function(item) {
+                    item.classList.remove("active-conversation");
+                });
+
+                conversation.classList.add("active-conversation");
+
+                const name =
+                    conversation.dataset.name;
+
+                const role =
+                    conversation.dataset.role;
+
+                chatName.textContent = name;
+
+                chatRole.textContent =
+                    "🟢 Online · " + role;
+
+            });
+
+        });
+        /* OPEN SELECTED SUPPORTER */
+
+const selectedSupporter =
+    localStorage.getItem("selectedSupporter");
+
+if (selectedSupporter) {
+
+    conversations.forEach(function(conversation) {
+
+        if (
+            conversation.dataset.name ===
+            selectedSupporter
+        ) {
+
+            conversation.click();
+
+        }
+
+    });
+
+}
+
+
+        /* SEND MESSAGE */
+
+        const messageForm =
+            document.getElementById("messageForm");
+
+        const messageInput =
+            document.getElementById("messageInput");
+
+        const chatMessages =
+            document.getElementById("chatMessages");
+
+
+        /* ==============================
+   MESSAGE STORAGE
+============================== */
+
+function getMessageKey() {
+
+    const supporter =
+        localStorage.getItem("selectedSupporter")
+        || "Ananya Sharma";
+
+    return "interconnectMessages_" + supporter;
+
+}
+
+
+/* LOAD SAVED MESSAGES */
+
+function loadSavedMessages() {
+
+    const savedMessages =
+        JSON.parse(
+            localStorage.getItem(getMessageKey())
+        ) || [];
+
+    savedMessages.forEach(function(messageData) {
+
+        const message =
+            document.createElement("div");
+
+        message.className =
+            "message " + messageData.type;
+
+        message.innerHTML = `
+            <p>${messageData.text}</p>
+            <span>${messageData.time}</span>
+        `;
+
+        chatMessages.appendChild(message);
+
+    });
+
+    chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+
+}
+
+
+/* SEND MESSAGE */
+
+messageForm.addEventListener(
+    "submit",
+    function(event) {
+
+        event.preventDefault();
+
+        const text =
+            messageInput.value.trim();
+
+        if (!text) {
+            return;
+        }
+
+
+        const now =
+            new Date();
+
+        const time =
+            now.toLocaleTimeString(
+                [],
+                {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                }
+            );
+
+
+        const messageData = {
+
+            text: text,
+
+            type: "sent",
+
+            time: time
+
+        };
+
+
+        /* GET OLD MESSAGES */
+
+        const messages =
+            JSON.parse(
+                localStorage.getItem(
+                    getMessageKey()
+                )
+            ) || [];
+
+
+        /* ADD NEW MESSAGE */
+
+        messages.push(messageData);
+
+
+        /* SAVE */
+
+        localStorage.setItem(
+            getMessageKey(),
+            JSON.stringify(messages)
+        );
+
+
+        /* SHOW MESSAGE */
+
+        const message =
+            document.createElement("div");
+
+        message.className =
+            "message sent";
+
+        message.innerHTML = `
+            <p>${text}</p>
+            <span>${time}</span>
+        `;
+
+        chatMessages.appendChild(message);
+
+
+        /* CLEAR INPUT */
+
+        messageInput.value = "";
+
+
+        /* SCROLL */
+
+        chatMessages.scrollTop =
+            chatMessages.scrollHeight;
+
+    }
+);
+
+
+/* LOAD WHEN PAGE OPENS */
+
+loadSavedMessages();
+    </script>
+
+</body>
+</html>

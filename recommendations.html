@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Your Matches | InterConnect</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- NAVBAR -->
+
+    <nav class="dashboard-nav">
+
+        <a href="dashboard.html" class="dashboard-logo">
+            <span class="logo-icon">◎</span>
+            InterConnect
+        </a>
+
+        <div class="dashboard-nav-links">
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="supporters.html">
+                Find Support
+            </a>
+
+            <a href="messages.html">
+                Messages
+            </a>
+
+            <a href="profile.html">
+                Profile
+            </a>
+
+        </div>
+
+        <button id="logoutBtn" class="logout-btn">
+            Logout
+        </button>
+
+    </nav>
+
+
+    <!-- MAIN -->
+
+    <main class="recommendations-container">
+
+        <section class="recommendations-header">
+
+            <p class="small-title">
+                INTERCONNECT MATCH
+            </p>
+
+            <h1>
+                We found some support for you. 💚
+            </h1>
+
+            <p id="matchDescription">
+                Based on what you shared, here are some people
+                who may be a good fit for you.
+            </p>
+
+        </section>
+
+
+        <!-- WHAT USER SHARED -->
+
+        <section class="match-summary">
+
+            <div class="match-summary-icon">
+                ✨
+            </div>
+
+            <div>
+
+                <p class="small-title">
+                    YOUR SUPPORT NEEDS
+                </p>
+
+                <h2 id="summaryTitle">
+                    Understanding what you're looking for
+                </h2>
+
+                <p id="summaryText">
+                    Your responses are being used to personalize
+                    these recommendations.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- MATCHES -->
+
+        <section>
+
+            <div class="matches-section-heading">
+
+                <div>
+                    <p class="small-title">
+                        RECOMMENDED FOR YOU
+                    </p>
+
+                    <h2>
+                        Your Support Matches
+                    </h2>
+                </div>
+
+            </div>
+
+
+            <div class="matches-grid" id="matchesGrid">
+
+                <!-- MATCHES WILL BE CREATED BY JAVASCRIPT -->
+
+            </div>
+
+        </section>
+
+
+        <!-- BACK -->
+
+        <div class="recommendations-back">
+
+            <a href="support.html">
+                ← Update my responses
+            </a>
+
+        </div>
+
+    </main>
+
+
+    <script>
+
+        /* ==============================
+           GET SUPPORT DATA
+        ============================== */
+
+        const supportData =
+            JSON.parse(
+                localStorage.getItem("interconnectSupport")
+            );
+
+
+        /* ==============================
+           SUPPORTERS
+        ============================== */
+
+        const supporters = [
+
+            {
+                name: "Ananya Sharma",
+                role: "Psychology Student",
+                avatar: "A",
+                type: "psychology",
+                concerns: [
+                    "academic_stress",
+                    "anxiety",
+                    "self_confidence"
+                ],
+                tags: [
+                    "Academic Stress",
+                    "Study Pressure",
+                    "Peer Support"
+                ],
+                description:
+                    "Interested in helping students dealing with academic pressure, stress and everyday challenges."
+            },
+
+
+            {
+                name: "Rahul Mehta",
+                role: "Trained Peer Supporter",
+                avatar: "R",
+                type: "peer",
+                concerns: [
+                    "loneliness",
+                    "relationship",
+                    "anxiety"
+                ],
+                tags: [
+                    "Loneliness",
+                    "Relationships",
+                    "Someone to Talk To"
+                ],
+                description:
+                    "Provides a friendly space for people who simply need someone to listen and understand."
+            },
+
+
+            {
+                name: "Sara Khan",
+                role: "Psychology Graduate",
+                avatar: "S",
+                type: "psychology",
+                concerns: [
+                    "career",
+                    "self_confidence",
+                    "anxiety"
+                ],
+                tags: [
+                    "Self-confidence",
+                    "Career",
+                    "Personal Growth"
+                ],
+                description:
+                    "Interested in supporting young people with confidence, career confusion and personal growth."
+            }
+
+        ];
+
+
+        /* ==============================
+           IF NO DATA
+        ============================== */
+
+        if (!supportData) {
+
+            window.location.href =
+                "support.html";
+
+        }
+
+
+        /* ==============================
+           MATCH LOGIC
+        ============================== */
+
+        if (supportData) {
+
+            const selectedConcerns =
+                supportData.concerns || [];
+
+            const preference =
+                supportData.supportPreference;
+
+
+            const scoredSupporters =
+                supporters.map(function(supporter) {
+
+                    let score = 0;
+
+
+                    /* CONCERN MATCH */
+
+                    selectedConcerns.forEach(
+                        function(concern) {
+
+                            if (
+                                supporter.concerns
+                                    .includes(concern)
+                            ) {
+                                score += 3;
+                            }
+
+                        }
+                    );
+
+
+                    /* PREFERENCE MATCH */
+
+                    if (
+                        preference === "psychology_student" &&
+                        supporter.type === "psychology"
+                    ) {
+                        score += 4;
+                    }
+
+
+                    if (
+                        preference === "peer" &&
+                        supporter.type === "peer"
+                    ) {
+                        score += 4;
+                    }
+
+
+                    /* PROFESSIONAL */
+
+                    if (
+                        preference === "professional"
+                    ) {
+
+                        score += 0;
+
+                    }
+
+
+                    /* UNSURE */
+
+                    if (
+                        preference === "unsure"
+                    ) {
+
+                        score += 1;
+
+                    }
+
+
+                    return {
+                        ...supporter,
+                        score: score
+                    };
+
+                });
+
+
+            /* SORT */
+
+            scoredSupporters.sort(
+                function(a, b) {
+
+                    return b.score - a.score;
+
+                }
+            );
+
+
+            /* SHOW */
+
+            const matchesGrid =
+                document.getElementById(
+                    "matchesGrid"
+                );
+
+
+            scoredSupporters.forEach(
+                function(supporter, index) {
+
+                    const card =
+                        document.createElement("div");
+
+                    card.className =
+                        "match-card";
+
+
+                    let reason =
+                        "This supporter may be a good fit based on your preferences.";
+
+
+                    if (supporter.score >= 7) {
+
+                        reason =
+                            "Strong match based on the support you selected and the areas you mentioned.";
+
+                    }
+                    else if (supporter.score >= 4) {
+
+                        reason =
+                            "Good match based on some of the support areas you selected.";
+
+                    }
+
+
+                    card.innerHTML = `
+
+                        <div class="match-card-top">
+
+                            <div class="match-avatar">
+                                ${supporter.avatar}
+                            </div>
+
+                            <span class="match-badge">
+                                ${index === 0 ? "Best Match" : "Recommended"}
+                            </span>
+
+                        </div>
+
+
+                        <h2>
+                            ${supporter.name}
+                        </h2>
+
+
+                        <p class="match-role">
+                            ${supporter.role}
+                        </p>
+
+
+                        <p class="match-description">
+                            ${supporter.description}
+                        </p>
+
+
+                        <div class="match-tags">
+
+                            ${supporter.tags.map(
+                                function(tag) {
+
+                                    return `
+                                        <span>${tag}</span>
+                                    `;
+
+                                }
+                            ).join("")}
+
+                        </div>
+
+
+                        <div class="match-reason">
+
+                            <strong>
+                                Why this match?
+                            </strong>
+
+                            <p>
+                                ${reason}
+                            </p>
+
+                        </div>
+
+
+                        <button
+                            class="connect-match-btn"
+                            data-name="${supporter.name}">
+
+                            Connect →
+                            
+                        </button>
+
+                    `;
+
+
+                    matchesGrid.appendChild(card);
+
+                }
+            );
+
+
+            /* SUMMARY */
+
+            const summaryText =
+                document.getElementById(
+                    "summaryText"
+                );
+
+
+            let summary = "";
+
+
+            if (selectedConcerns.length > 0) {
+
+                summary =
+                    "You mentioned " +
+                    selectedConcerns.length +
+                    " area" +
+                    (
+                        selectedConcerns.length > 1
+                        ? "s"
+                        : ""
+                    ) +
+                    " you'd like support with.";
+
+            }
+            else {
+
+                summary =
+                    "Your preferences are helping us find suitable support.";
+
+            }
+
+
+            summaryText.textContent =
+                summary;
+
+        }
+
+
+        /* ==============================
+   CONNECT BUTTON
+============================== */
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target.classList
+                .contains("connect-match-btn")
+        ) {
+
+            const name =
+                event.target.dataset.name;
+
+            /* SAVE SELECTED SUPPORTER */
+
+            localStorage.setItem(
+                "selectedSupporter",
+                name
+            );
+
+            /* OPEN MESSAGES */
+
+            window.location.href =
+                "messages.html";
+
+        }
+
+    }
+);
+
+
+        /* ==============================
+           LOGOUT
+        ============================== */
+
+        document.getElementById("logoutBtn")
+            .addEventListener(
+                "click",
+                function() {
+
+                    localStorage.removeItem(
+                        "interconnectUser"
+                    );
+
+                    localStorage.removeItem(
+                        "interconnectSupport"
+                    );
+
+                    window.location.href =
+                        "login.html";
+
+                }
+            );
+
+    </script>
+
+</body>
+</html>

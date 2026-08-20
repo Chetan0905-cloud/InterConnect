@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Profile | InterConnect</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- NAVBAR -->
+
+    <nav class="dashboard-nav">
+
+        <a href="index.html" class="dashboard-logo">
+            <span class="logo-icon">◎</span>
+            InterConnect
+        </a>
+
+        <div class="dashboard-nav-links">
+
+            <a href="dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="supporters.html">
+                Find Support
+            </a>
+
+            <a href="messages.html">
+                Messages
+            </a>
+
+            <a href="profile.html" class="active">
+                Profile
+            </a>
+
+        </div>
+
+        <button id="logoutBtn" class="logout-btn">
+            Logout
+        </button>
+
+    </nav>
+
+
+    <!-- PROFILE -->
+
+    <main class="profile-container">
+
+        <section class="profile-header">
+
+            <p class="small-title">
+                YOUR INTERCONNECT PROFILE
+            </p>
+
+            <h1>
+                Your Profile
+            </h1>
+
+            <p>
+                Manage your information and see how you appear
+                within the InterConnect community.
+            </p>
+
+        </section>
+
+
+        <section class="profile-layout">
+
+            <!-- PROFILE CARD -->
+
+            <div class="profile-card">
+
+                <div class="profile-avatar" id="profileAvatar">
+                    U
+                </div>
+
+                <h2 id="profileName">
+                    User
+                </h2>
+
+                <p id="profileRole">
+                    Support Seeker
+                </p>
+
+                <span class="profile-status">
+                    ● Active
+                </span>
+
+            </div>
+
+
+            <!-- INFORMATION -->
+
+            <div class="profile-details">
+
+                <div class="profile-details-header">
+
+                    <div>
+
+                        <p class="small-title">
+                            PERSONAL INFORMATION
+                        </p>
+
+                        <h2>
+                            Account details
+                        </h2>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="edit-profile-btn"
+                        id="editProfileBtn">
+
+                        Edit Profile
+
+                    </button>
+
+                </div>
+
+
+                <!-- PROFILE INFORMATION -->
+
+                <div class="profile-info-grid">
+
+                    <div class="profile-info-item">
+
+                        <span>Full name</span>
+
+                        <strong id="infoName">
+                            —
+                        </strong>
+
+                        <input
+                            id="editName"
+                            type="text"
+                            style="display:none;"
+                        >
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>Email address</span>
+
+                        <strong id="infoEmail">
+                            —
+                        </strong>
+
+                        <input
+                            id="editEmail"
+                            type="email"
+                            disabled
+                            style="display:none;"
+                        >
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>Account type</span>
+
+                        <strong id="infoRole">
+                            —
+                        </strong>
+
+                        <input
+                            id="editRole"
+                            type="text"
+                            style="display:none;"
+                        >
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>Location</span>
+
+                        <strong id="infoLocation">
+                            —
+                        </strong>
+
+                        <input
+                            id="editLocation"
+                            type="text"
+                            style="display:none;"
+                        >
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>Age</span>
+
+                        <strong id="infoAge">
+                            —
+                        </strong>
+
+                        <input
+                            id="editAge"
+                            type="number"
+                            style="display:none;"
+                        >
+
+                    </div>
+
+
+                    <div class="profile-info-item">
+
+                        <span>Interests</span>
+
+                        <strong id="infoInterests">
+                            —
+                        </strong>
+
+                        <input
+                            id="editInterests"
+                            type="text"
+                            style="display:none;"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- EDIT ACTIONS -->
+
+                <div
+                    class="profile-actions"
+                    id="profileActions"
+                    style="display:none;"
+                >
+
+                    <button
+                        type="button"
+                        id="cancelProfileBtn"
+                        class="cancel-profile-btn">
+
+                        Cancel
+
+                    </button>
+
+                    <button
+                        type="button"
+                        id="saveProfileBtn"
+                        class="save-profile-btn">
+
+                        Save Changes
+
+                    </button>
+
+                </div>
+
+
+                <!-- ABOUT -->
+
+                <div class="profile-about">
+
+                    <p class="small-title">
+                        ABOUT YOU
+                    </p>
+
+                    <p id="profileAbout">
+                        Your profile information will appear here.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        /* GET USER */
+
+        const userData =
+            JSON.parse(
+                localStorage.getItem("interconnectUser")
+            );
+
+
+        /* IF NOT LOGGED IN */
+
+        if (!userData) {
+
+            window.location.href = "login.html";
+
+        }
+
+
+        /* ELEMENTS */
+
+        const profileName =
+            document.getElementById("profileName");
+
+        const profileRole =
+            document.getElementById("profileRole");
+
+        const profileAvatar =
+            document.getElementById("profileAvatar");
+
+        const infoName =
+            document.getElementById("infoName");
+
+        const infoEmail =
+            document.getElementById("infoEmail");
+
+        const infoRole =
+            document.getElementById("infoRole");
+
+        const infoLocation =
+            document.getElementById("infoLocation");
+
+        const infoAge =
+            document.getElementById("infoAge");
+
+        const infoInterests =
+            document.getElementById("infoInterests");
+
+        const profileAbout =
+            document.getElementById("profileAbout");
+
+
+        const editProfileBtn =
+            document.getElementById("editProfileBtn");
+
+        const profileActions =
+            document.getElementById("profileActions");
+
+
+        const editName =
+            document.getElementById("editName");
+
+        const editEmail =
+            document.getElementById("editEmail");
+
+        const editRole =
+            document.getElementById("editRole");
+
+        const editLocation =
+            document.getElementById("editLocation");
+
+        const editAge =
+            document.getElementById("editAge");
+
+        const editInterests =
+            document.getElementById("editInterests");
+
+
+        /* DISPLAY PROFILE */
+
+        function displayProfile() {
+
+            const name =
+                userData.name || "User";
+
+            const email =
+                userData.email || "Not provided";
+
+            const role =
+                userData.role || "Support Seeker";
+
+            const location =
+                userData.location || "Not provided";
+
+            const age =
+                userData.age || "Not provided";
+
+            const interests =
+                userData.interests || "Not provided";
+
+
+            /* PROFILE CARD */
+
+            profileName.textContent = name;
+
+            profileRole.textContent = role;
+
+            profileAvatar.textContent =
+                name.charAt(0).toUpperCase();
+
+
+            /* INFORMATION */
+
+            infoName.textContent = name;
+
+            infoEmail.textContent = email;
+
+            infoRole.textContent = role;
+
+            infoLocation.textContent = location;
+
+            infoAge.textContent = age;
+
+            infoInterests.textContent = interests;
+
+
+            /* ABOUT */
+
+            profileAbout.textContent =
+                interests !== "Not provided"
+                ? "Interested in " + interests + "."
+                : "No additional information provided yet.";
+
+        }
+
+
+        /* INITIAL DISPLAY */
+
+        if (userData) {
+
+            displayProfile();
+
+        }
+
+
+        /* LOGOUT */
+
+        document.getElementById("logoutBtn")
+            .addEventListener(
+                "click",
+                function () {
+
+                    localStorage.removeItem(
+                        "interconnectUser"
+                    );
+
+                    window.location.href =
+                        "login.html";
+
+                }
+            );
+
+
+        /* EDIT PROFILE */
+
+        editProfileBtn.addEventListener(
+            "click",
+            function () {
+
+                /* PUT CURRENT VALUES INTO INPUTS */
+
+                editName.value =
+                    userData.name || "";
+
+                editEmail.value =
+                    userData.email || "";
+
+                editRole.value =
+                    userData.role || "";
+
+                editLocation.value =
+                    userData.location || "";
+
+                editAge.value =
+                    userData.age || "";
+
+                editInterests.value =
+                    userData.interests || "";
+
+
+                /* HIDE TEXT */
+
+                infoName.style.display = "none";
+                infoEmail.style.display = "none";
+                infoRole.style.display = "none";
+                infoLocation.style.display = "none";
+                infoAge.style.display = "none";
+                infoInterests.style.display = "none";
+
+
+                /* SHOW INPUTS */
+
+                editName.style.display = "block";
+                editEmail.style.display = "block";
+                editRole.style.display = "block";
+                editLocation.style.display = "block";
+                editAge.style.display = "block";
+                editInterests.style.display = "block";
+
+
+                /* ENABLE EDITABLE FIELDS */
+
+                editName.disabled = false;
+                editRole.disabled = false;
+                editLocation.disabled = false;
+                editAge.disabled = false;
+                editInterests.disabled = false;
+
+
+                /* BUTTONS */
+
+                editProfileBtn.style.display =
+                    "none";
+
+                profileActions.style.display =
+                    "flex";
+
+            }
+        );
+
+
+        /* SAVE CHANGES */
+
+        document.getElementById("saveProfileBtn")
+            .addEventListener(
+                "click",
+                function () {
+
+                    /* UPDATE USER DATA */
+
+                    userData.name =
+                        editName.value.trim();
+
+                    userData.role =
+                        editRole.value.trim();
+
+                    userData.location =
+                        editLocation.value.trim();
+
+                    userData.age =
+                        editAge.value.trim();
+
+                    userData.interests =
+                        editInterests.value.trim();
+
+
+                    /* SAVE TO LOCAL STORAGE */
+
+                    localStorage.setItem(
+                        "interconnectUser",
+                        JSON.stringify(userData)
+                    );
+
+
+                    /* DISPLAY UPDATED PROFILE */
+
+                    displayProfile();
+
+
+                    /* HIDE INPUTS */
+
+                    editName.style.display = "none";
+                    editEmail.style.display = "none";
+                    editRole.style.display = "none";
+                    editLocation.style.display = "none";
+                    editAge.style.display = "none";
+                    editInterests.style.display = "none";
+
+
+                    /* SHOW TEXT */
+
+                    infoName.style.display = "block";
+                    infoEmail.style.display = "block";
+                    infoRole.style.display = "block";
+                    infoLocation.style.display = "block";
+                    infoAge.style.display = "block";
+                    infoInterests.style.display = "block";
+
+
+                    /* BUTTONS */
+
+                    profileActions.style.display =
+                        "none";
+
+                    editProfileBtn.style.display =
+                        "inline-block";
+
+
+                    alert(
+                        "Profile updated successfully!"
+                    );
+
+                }
+            );
+
+
+        /* CANCEL */
+
+        document.getElementById("cancelProfileBtn")
+            .addEventListener(
+                "click",
+                function () {
+
+                    /* HIDE INPUTS */
+
+                    editName.style.display = "none";
+                    editEmail.style.display = "none";
+                    editRole.style.display = "none";
+                    editLocation.style.display = "none";
+                    editAge.style.display = "none";
+                    editInterests.style.display = "none";
+
+
+                    /* SHOW TEXT */
+
+                    infoName.style.display = "block";
+                    infoEmail.style.display = "block";
+                    infoRole.style.display = "block";
+                    infoLocation.style.display = "block";
+                    infoAge.style.display = "block";
+                    infoInterests.style.display = "block";
+
+
+                    /* BUTTONS */
+
+                    profileActions.style.display =
+                        "none";
+
+                    editProfileBtn.style.display =
+                        "inline-block";
+
+                }
+            );
+
+    </script>
+
+</body>
+</html>

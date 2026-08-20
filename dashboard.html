@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | InterConnect</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- NAVBAR -->
+
+    <nav class="dashboard-nav">
+
+        <a href="index.html" class="dashboard-logo">
+            <span class="logo-icon">◎</span>
+            InterConnect
+        </a>
+
+        <div class="dashboard-nav-links">
+
+            <a href="dashboard.html" class="active">
+                Dashboard
+            </a>
+
+            <a href="#">
+                Find Support
+            </a>
+
+            <a href="messages.html">
+                Messages
+            </a>
+
+            <a href="profile.html">
+                Profile
+            </a>
+
+        </div>
+
+        <button id="logoutBtn" class="logout-btn">
+            Logout
+        </button>
+
+    </nav>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="dashboard-container">
+
+        <!-- WELCOME -->
+
+        <section class="dashboard-welcome">
+
+            <div>
+
+                <p class="small-title">
+                    YOUR INTERCONNECT SPACE
+                </p>
+
+                <h1>
+                    Welcome, <span id="userName">there</span> 👋
+                </h1>
+
+                <p>
+                    Find the right support, connect with people,
+                    and take the next step at your own pace.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- QUICK ACTIONS -->
+
+        <section class="dashboard-grid">
+
+            <div class="dashboard-card map-card">
+
+                <div class="card-icon">
+                    🗺️
+                </div>
+
+                <h2>
+                    Find Support Near You
+                </h2>
+
+                <p>
+                    Discover nearby support resources,
+                    professionals and verified supporters.
+                </p>
+
+                <button
+            class="dashboard-btn"
+            onclick="window.location.href='supporters.html'">
+            Find Support →
+        </button>
+                    </div>
+
+
+            <div class="dashboard-card ai-card">
+
+                <div class="card-icon">
+                    🤖
+                </div>
+
+                <h2>
+                    AI Support Match
+                </h2>
+
+                <p>
+                    Tell our AI how you're feeling and
+                    discover support that may suit your needs.
+                </p>
+
+                <button
+    class="dashboard-btn"
+    onclick="window.location.href='support.html'">
+
+    Find My Match →
+
+</button>
+
+            </div>
+
+        </section>
+
+
+        <!-- RECOMMENDATIONS -->
+
+        <section class="dashboard-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="small-title">
+                        PERSONALIZED FOR YOU
+                    </p>
+
+                    <h2>
+                        Recommended Support
+                    </h2>
+
+                </div>
+
+                <a href="#">
+                    View all →
+                </a>
+
+            </div>
+
+
+            <div class="supporter-grid">
+
+                <div class="supporter-card">
+
+                    <div class="supporter-avatar">
+                        A
+                    </div>
+
+                    <div class="supporter-info">
+
+                        <h3>
+                            Ananya Sharma
+                        </h3>
+
+                        <p>
+                            Psychology Student
+                        </p>
+
+                        <span>
+                            📍 2.4 km away
+                        </span>
+
+                    </div>
+
+                    <button>
+                        Connect
+                    </button>
+
+                </div>
+
+
+                <div class="supporter-card">
+
+                    <div class="supporter-avatar">
+                        R
+                    </div>
+
+                    <div class="supporter-info">
+
+                        <h3>
+                            Rahul Mehta
+                        </h3>
+
+                        <p>
+                            Trained Peer Supporter
+                        </p>
+
+                        <span>
+                            📍 4.1 km away
+                        </span>
+
+                    </div>
+
+                    <button>
+                        Connect
+                    </button>
+
+                </div>
+
+
+                <div class="supporter-card">
+
+                    <div class="supporter-avatar">
+                        S
+                    </div>
+
+                    <div class="supporter-info">
+
+                        <h3>
+                            Sara Khan
+                        </h3>
+
+                        <p>
+                            Psychology Graduate
+                        </p>
+
+                        <span>
+                            📍 5.7 km away
+                        </span>
+
+                    </div>
+
+                    <button>
+                        Connect
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- AI SECTION -->
+
+        <section class="ai-insight">
+
+            <div class="ai-insight-icon">
+                ✨
+            </div>
+
+            <div>
+
+                <p class="small-title">
+                    INTERCONNECT AI
+                </p>
+
+                <h2>
+                    Not sure where to start?
+                </h2>
+
+                <p>
+                    Our AI can understand your needs and
+                    help you find relevant support options.
+                </p>
+
+            </div>
+
+            <button class="dashboard-btn">
+                Talk to AI →
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        /* SHOW USER NAME */
+
+        const userData =
+            JSON.parse(localStorage.getItem("interconnectUser"));
+
+        if (userData && userData.name) {
+
+            document.getElementById("userName").textContent =
+                userData.name.split(" ")[0];
+
+        }
+
+
+        /* LOGOUT */
+
+        document.getElementById("logoutBtn")
+            .addEventListener("click", function () {
+
+                localStorage.removeItem("interconnectUser");
+
+                window.location.href = "login.html";
+
+            });
+
+    </script>
+
+</body>
+</html>

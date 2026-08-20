@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | InterConnect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="auth-page">
+
+    <div class="auth-container">
+
+        <a href="index.html" class="auth-logo">
+            <span class="logo-icon">◎</span>
+            InterConnect
+        </a>
+
+        <div class="auth-card signup-form-card">
+
+            <div class="auth-heading">
+                <p class="small-title">JOIN INTERCONNECT</p>
+                <h1>Create your account.</h1>
+                <p>Choose how you'd like to use InterConnect.</p>
+            </div>
+
+            <!-- ROLE SELECTION -->
+
+            <div class="signup-role-selection" id="roleSelection">
+
+                <button class="role-card" id="seekerRole" type="button">
+
+                    <div class="role-icon">👤</div>
+
+                    <div>
+                        <h3>I'm looking for support</h3>
+                        <p>
+                            Find suitable support and connect
+                            with people who can help.
+                        </p>
+                    </div>
+
+                </button>
+
+
+                <button class="role-card" id="supporterRole" type="button">
+
+                    <div class="role-icon">🧠</div>
+
+                    <div>
+                        <h3>I'm a supporter</h3>
+                        <p>
+                            Psychology students and trained
+                            supporters can provide peer support.
+                        </p>
+                    </div>
+
+                </button>
+
+            </div>
+
+
+            <!-- SEEKER FORM -->
+
+            <form id="seekerForm" class="signup-form hidden">
+
+                <button type="button" class="back-role" id="backFromSeeker">
+                    ← Change account type
+                </button>
+
+                <div class="selected-role">
+                    👤 Support Seeker
+                </div>
+
+                <label for="seekerName">Full name</label>
+                <input
+                    type="text"
+                    id="seekerName"
+                    placeholder="Your full name"
+                    required
+                >
+
+                <label for="seekerEmail">Email address</label>
+                <input
+                    type="email"
+                    id="seekerEmail"
+                    placeholder="you@example.com"
+                    required
+                >
+
+                <label for="seekerPassword">Password</label>
+                <input
+                    type="password"
+                    id="seekerPassword"
+                    placeholder="Create a password"
+                    required
+                >
+
+                <div class="two-inputs">
+
+                    <div>
+                        <label for="seekerAge">Age</label>
+                        <input
+                            type="number"
+                            id="seekerAge"
+                            placeholder="Age"
+                            min="13"
+                            required
+                        >
+                    </div>
+
+                    <div>
+                        <label for="seekerLocation">Location</label>
+                        <input
+                            type="text"
+                            id="seekerLocation"
+                            placeholder="City"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+                <label for="seekerInterests">
+                    Interests
+                </label>
+
+                <input
+                    type="text"
+                    id="seekerInterests"
+                    placeholder="e.g. studies, fitness, music"
+                >
+
+                <button type="submit" class="auth-submit">
+                    Create Account →
+                </button>
+
+            </form>
+
+
+            <!-- SUPPORTER FORM -->
+
+            <form id="supporterForm" class="signup-form hidden">
+
+                <button type="button" class="back-role" id="backFromSupporter">
+                    ← Change account type
+                </button>
+
+                <div class="selected-role">
+                    🧠 Supporter
+                </div>
+
+                <label for="supporterName">Full name</label>
+                <input
+                    type="text"
+                    id="supporterName"
+                    placeholder="Your full name"
+                    required
+                >
+
+                <label for="supporterEmail">Email address</label>
+                <input
+                    type="email"
+                    id="supporterEmail"
+                    placeholder="you@example.com"
+                    required
+                >
+
+                <label for="supporterPassword">Password</label>
+                <input
+                    type="password"
+                    id="supporterPassword"
+                    placeholder="Create a password"
+                    required
+                >
+
+                <label for="qualification">
+                    Education / Qualification
+                </label>
+
+                <input
+                    type="text"
+                    id="qualification"
+                    placeholder="e.g. B.A. Psychology"
+                    required
+                >
+
+                <label for="college">
+                    College / Institution
+                </label>
+
+                <input
+                    type="text"
+                    id="college"
+                    placeholder="Your college or institution"
+                    required
+                >
+
+                <label for="supporterLocation">
+                    Location
+                </label>
+
+                <input
+                    type="text"
+                    id="supporterLocation"
+                    placeholder="City"
+                    required
+                >
+
+                <label for="bio">
+                    Short bio
+                </label>
+
+                <textarea
+                    id="bio"
+                    placeholder="Tell people a little about yourself..."
+                    rows="4"
+                ></textarea>
+
+                <label>Availability</label>
+
+                <div class="availability">
+
+                    <label>
+                        <input type="radio" name="availability" value="available" checked>
+                        Available
+                    </label>
+
+                    <label>
+                        <input type="radio" name="availability" value="unavailable">
+                        Not available
+                    </label>
+
+                </div>
+
+                <div class="verification-note">
+                    🛡️ Supporter accounts require verification
+                    before they can accept support requests.
+                </div>
+
+                <button type="submit" class="auth-submit">
+                    Submit for Verification →
+                </button>
+
+            </form>
+
+            <p class="switch-auth">
+                Already have an account?
+                <a href="login.html">Login</a>
+            </p>
+
+        </div>
+
+    </div>
+
+    <script src="signup.js"></script>
+
+</body>
+</html>
