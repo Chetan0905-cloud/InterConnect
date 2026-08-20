@@ -2347,6 +2347,7 @@ footer p {
 .message.sent {
     margin-left: auto;
 }
+/* InterConnect deployed stylesheet */
 
 .message.sent p {
     background: #138f7b;
