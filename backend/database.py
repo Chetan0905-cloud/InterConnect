@@ -5,13 +5,13 @@ import mysql.connector
 def get_db_connection():
     try:
         connection = mysql.connector.connect(
-            host=os.getenv("DB_HOST", "127.0.0.1"),
-            port=int(os.getenv("DB_PORT", "3306")),
-            user=os.getenv("DB_USER", "root"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME", "interconnect"),
+            host=os.getenv("MYSQLHOST", "127.0.0.1"),
+            port=int(os.getenv("MYSQLPORT", "3306")),
+            user=os.getenv("MYSQLUSER", "root"),
+            password=os.getenv("MYSQLPASSWORD"),
+            database=os.getenv("MYSQLDATABASE", "interconnect"),
             use_pure=True,
-            connection_timeout=5
+            connection_timeout=10
         )
 
         return connection
