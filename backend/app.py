@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from .models import create_user
+from  models import create_user
 from .database import get_db_connection
 
 app = Flask(__name__)
