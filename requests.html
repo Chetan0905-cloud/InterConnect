@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Support Requests | InterConnect</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- NAVBAR -->
+
+    <nav class="dashboard-nav">
+
+        <a href="index.html" class="dashboard-logo">
+            <span class="logo-icon">◎</span>
+            InterConnect
+        </a>
+
+        <div class="dashboard-nav-links">
+
+            <a href="supporter-dashboard.html">
+                Dashboard
+            </a>
+
+            <a href="requests.html" class="active">
+                Requests
+            </a>
+
+            <a href="messages.html">
+                Messages
+            </a>
+
+            <a href="profile.html">
+                Profile
+            </a>
+
+        </div>
+
+        <button id="logoutBtn" class="logout-btn">
+            Logout
+        </button>
+
+    </nav>
+
+
+    <!-- MAIN -->
+
+    <main class="dashboard-container">
+
+        <section class="dashboard-welcome">
+
+            <div>
+
+                <p class="small-title">
+                    SUPPORT REQUESTS
+                </p>
+
+                <h1>
+                    People Looking for Support 🤝
+                </h1>
+
+                <p>
+                    Review support requests and choose
+                    who you would like to connect with.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- REQUESTS -->
+
+        <section class="dashboard-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="small-title">
+                        REQUESTS
+                    </p>
+
+                    <h2>
+                        Available Support Requests
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div id="requestsContainer">
+
+                <p id="loadingMessage">
+                    Loading requests...
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        /* GET LOGGED-IN USER */
+
+        const userData =
+            JSON.parse(localStorage.getItem("interconnectUser"));
+
+        console.log("Requests page user:", userData);
+
+
+        /* CHECK LOGIN */
+
+        if (!userData) {
+
+            window.location.href = "login.html";
+
+        }
+
+
+        /* CHECK SUPPORTER */
+
+        if (
+            userData &&
+            userData.role &&
+            userData.role.toLowerCase() !== "supporter"
+        ) {
+
+            window.location.href = "dashboard.html";
+
+        }
+
+
+        /* LOGOUT */
+
+        document.getElementById("logoutBtn")
+            .addEventListener("click", function () {
+
+                localStorage.removeItem("interconnectUser");
+
+                window.location.href = "login.html";
+
+            });
+
+
+        /* LOAD REQUESTS */
+
+        async function loadRequests() {
+
+            const container =
+                document.getElementById("requestsContainer");
+
+            try {
+
+                const response = await fetch(
+                    "https://interconnect-production-9022.up.railway.app/support-requests"
+                );
+
+                const result = await response.json();
+
+                console.log("Requests response:", result);
+
+                if (!response.ok) {
+
+                    container.innerHTML =
+                        "<p>Unable to load support requests.</p>";
+
+                    return;
+
+                }
+
+
+                const requests =
+                    result.requests || result;
+
+
+                if (!requests || requests.length === 0) {
+
+                    container.innerHTML = `
+                        <div class="dashboard-card">
+                            <div class="card-icon">📭</div>
+
+                            <h2>No Support Requests Yet</h2>
+
+                            <p>
+                                There are currently no support requests
+                                available.
+                            </p>
+                        </div>
+                    `;
+
+                    return;
+
+                }
+
+
+                container.innerHTML = "";
+
+
+                requests.forEach(function(request) {
+
+                    const card =
+                        document.createElement("div");
+
+                    card.className = "dashboard-card";
+
+                    card.style.marginBottom = "20px";
+
+
+                    card.innerHTML = `
+
+                        <div class="card-icon">
+                            🤝
+                        </div>
+
+                        <h2>
+                            ${request.name || "Support Seeker"}
+                        </h2>
+
+                        <p>
+                            ${request.message ||
+                            request.description ||
+                            "Support requested."}
+                        </p>
+
+                        <p>
+                            <strong>Status:</strong>
+                            ${request.status || "Pending"}
+                        </p>
+
+                        <button
+                            class="dashboard-btn"
+                            onclick="acceptRequest(${request.id})">
+
+                            Accept Request →
+
+                        </button>
+
+                    `;
+
+
+                    container.appendChild(card);
+
+                });
+
+            } catch (error) {
+
+                console.error("Request loading error:", error);
+
+                container.innerHTML = `
+                    <div class="dashboard-card">
+
+                        <div class="card-icon">
+                            ⚠️
+                        </div>
+
+                        <h2>
+                            Unable to Load Requests
+                        </h2>
+
+                        <p>
+                            Please make sure the server is running
+                            and try again.
+                        </p>
+
+                    </div>
+                `;
+
+            }
+
+        }
+
+
+        /* ACCEPT REQUEST */
+
+        async function acceptRequest(requestId) {
+
+            try {
+
+                const response = await fetch(
+                    "https://interconnect-production-9022.up.railway.app/support-requests/" +
+                    requestId,
+                    {
+                        method: "PUT",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            status: "accepted",
+                            supporter_id: userData.id
+                        })
+                    }
+                );
+
+
+                const result =
+                    await response.json();
+
+                console.log("Accept response:", result);
+
+
+                if (response.ok) {
+
+                    alert("Support request accepted!");
+
+                    loadRequests();
+
+                } else {
+
+                    alert(
+                        result.message ||
+                        "Unable to accept request."
+                    );
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Accept request error:",
+                    error
+                );
+
+                alert(
+                    "Unable to connect to the server."
+                );
+
+            }
+
+        }
+
+
+        /* LOAD WHEN PAGE OPENS */
+
+        loadRequests();
+
+    </script>
+
+</body>
+
+</html>
