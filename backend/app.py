@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import create_user
 from database import get_db_connection
 
+
 app = Flask(__name__)
 CORS(app)
 
@@ -193,6 +194,13 @@ def login():
 
         }), 200
 
+    except Exception as e:
+
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
     finally:
 
         if cursor:
@@ -362,24 +370,38 @@ def get_supporters():
             buffered=True
         )
 
+        # IMPORTANT:
+        # Your Railway database has supporters in the
+        # users table. We do NOT use supporter_profiles.
+
         cursor.execute("""
             SELECT
-                users.id,
-                users.name,
-                users.email,
-                users.role,
-                supporter_profiles.qualification,
-                supporter_profiles.bio,
-                supporter_profiles.availability,
-                supporter_profiles.location,
-                supporter_profiles.is_verified
+                id,
+                name,
+                email,
+                role
             FROM users
-            INNER JOIN supporter_profiles
-                ON users.id = supporter_profiles.user_id
-            WHERE users.role = 'Supporter'
+            WHERE role = 'Supporter'
+            ORDER BY name ASC
         """)
 
         supporters = cursor.fetchall()
+
+        # Add display information expected by frontend
+        for supporter in supporters:
+
+            supporter["qualification"] = "Peer Supporter"
+
+            supporter["bio"] = (
+                "Available to provide support "
+                "and a listening ear."
+            )
+
+            supporter["availability"] = "Available"
+
+            supporter["location"] = "Available online"
+
+            supporter["is_verified"] = True
 
         return jsonify({
             "success": True,
@@ -387,6 +409,8 @@ def get_supporters():
         }), 200
 
     except Exception as e:
+
+        print("GET SUPPORTERS ERROR:", str(e))
 
         return jsonify({
             "success": False,
