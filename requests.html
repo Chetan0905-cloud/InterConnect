@@ -161,9 +161,9 @@
 
             try {
 
-                const response = await fetch(
-                    "https://interconnect-production-9022.up.railway.app/support-requests"
-                );
+               const response = await fetch(
+                "https://interconnect-production-9022.up.railway.app/support-requests/" + userData.id
+);
 
                 const result = await response.json();
 
