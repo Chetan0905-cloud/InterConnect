@@ -277,13 +277,15 @@ def update_support_request(request_id):
 # GET SUPPORTERS
 # =====================================================
 
+# =====================================================
+# GET SUPPORTERS
+# =====================================================
 @app.route("/supporters", methods=["GET"])
 def get_supporters():
 
     connection = get_db_connection()
 
     if not connection:
-
         return jsonify({
             "success": False,
             "message": "Database connection failed"
@@ -293,42 +295,40 @@ def get_supporters():
 
     try:
 
-        cursor = connection.cursor(dictionary=True, buffered=True)
+        cursor = connection.cursor(
+            dictionary=True,
+            buffered=True
+        )
 
         cursor.execute("""
             SELECT
-                users.id,
-                users.name,
-                users.email,
-                users.role,
-                supporter_profiles.qualification,
-                supporter_profiles.bio,
-                supporter_profiles.availability,
-                supporter_profiles.location,
-                supporter_profiles.is_verified
+                id,
+                name,
+                email,
+                role,
+                qualification,
+                bio,
+                availability,
+                location
             FROM users
-            INNER JOIN supporter_profiles
-                ON users.id = supporter_profiles.user_id
-            WHERE users.role = 'Supporter'
+            WHERE role = 'Supporter'
+            ORDER BY name ASC
         """)
 
         supporters = cursor.fetchall()
 
         return jsonify({
-
             "success": True,
-
             "supporters": supporters
-
         }), 200
 
     except Exception as e:
 
-        return jsonify({
+        print("GET SUPPORTERS ERROR:", str(e))
 
+        return jsonify({
             "success": False,
             "message": str(e)
-
         }), 500
 
     finally:
