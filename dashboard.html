@@ -282,35 +282,61 @@
     </main>
 
 
-    <script>
+       <script>
 
-        /* SHOW USER NAME */
+    /* GET LOGGED-IN USER */
 
-        const userData =
-            JSON.parse(localStorage.getItem("interconnectUser"));
+    const userData =
+        JSON.parse(localStorage.getItem("interconnectUser"));
 
-        if (userData && userData.name) {
-
-            document.getElementById("userName").textContent =
-                userData.name.split(" ")[0];
-
-        }
-        console.log("Logged in user:", userData);
-        console.log("User role:", userData ? userData.role : "No role");
+    console.log("Logged in user:", userData);
+    console.log("User role:", userData ? userData.role : "No role");
 
 
-        /* LOGOUT */
+    /* CHECK LOGIN */
 
-        document.getElementById("logoutBtn")
-            .addEventListener("click", function () {
+    if (!userData) {
 
-                localStorage.removeItem("interconnectUser");
+        window.location.href = "login.html";
 
-                window.location.href = "login.html";
+    }
 
-            });
 
-    </script>
+    /* SHOW USER NAME */
 
+    if (userData && userData.name) {
+
+        document.getElementById("userName").textContent =
+            userData.name.split(" ")[0];
+
+    }
+
+
+    /* ROLE-BASED DASHBOARD */
+
+    if (userData && userData.role === "Supporter") {
+
+        /*
+         * Supporter account detected.
+         * Redirect to supporter dashboard.
+         */
+
+        window.location.href = "supporter-dashboard.html";
+
+    }
+
+
+    /* LOGOUT */
+
+    document.getElementById("logoutBtn")
+        .addEventListener("click", function () {
+
+            localStorage.removeItem("interconnectUser");
+
+            window.location.href = "login.html";
+
+        });
+
+</script>
 </body>
 </html>
