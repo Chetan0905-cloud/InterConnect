@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,7 +48,7 @@
     </nav>
 
 
-    <!-- MESSAGES -->
+    <!-- MAIN -->
 
     <main class="messages-container">
 
@@ -70,71 +71,45 @@
 
         <section class="messages-layout">
 
-            <!-- CONVERSATIONS -->
+            <!-- =========================
+                 CONVERSATIONS
+            ========================== -->
 
             <aside class="conversation-panel">
 
                 <div class="conversation-heading">
-                    <h2>Conversations</h2>
-                    <span>2</span>
-                </div>
 
+                    <h2>
+                        Conversations
+                    </h2>
 
-                <div class="conversation active-conversation"
-                     data-name="Ananya Sharma"
-                     data-role="Psychology Student">
-
-                    <div class="conversation-avatar">
-                        A
-                    </div>
-
-                    <div class="conversation-info">
-
-                        <h3>Ananya Sharma</h3>
-
-                        <p>
-                            Psychology Student
-                        </p>
-
-                        <span>
-                            I'm here if you need to talk.
-                        </span>
-
-                    </div>
-
-                    <div class="online-dot"></div>
+                    <span id="conversationCount">
+                        0
+                    </span>
 
                 </div>
 
 
-                <div class="conversation"
-                     data-name="Rahul Mehta"
-                     data-role="Trained Peer Supporter">
+                <div
+                    id="conversationList"
+                    class="conversation-list"
+                >
 
-                    <div class="conversation-avatar">
-                        R
-                    </div>
-
-                    <div class="conversation-info">
-
-                        <h3>Rahul Mehta</h3>
-
-                        <p>
-                            Trained Peer Supporter
-                        </p>
-
-                        <span>
-                            Take your time.
-                        </span>
-
-                    </div>
+                    <p
+                        id="noConversations"
+                        style="padding:20px;"
+                    >
+                        Loading conversations...
+                    </p>
 
                 </div>
 
             </aside>
 
 
-            <!-- CHAT -->
+            <!-- =========================
+                 CHAT
+            ========================== -->
 
             <section class="chat-panel">
 
@@ -142,18 +117,23 @@
 
                     <div class="chat-person">
 
-                        <div class="conversation-avatar">
-                            A
+                        <div
+                            class="conversation-avatar"
+                            id="chatAvatar"
+                        >
+                            ?
                         </div>
 
                         <div>
+
                             <h2 id="chatName">
-                                Ananya Sharma
+                                Select a conversation
                             </h2>
 
                             <p id="chatRole">
-                                🟢 Online · Psychology Student
+                                Choose someone from your conversations.
                             </p>
+
                         </div>
 
                     </div>
@@ -161,45 +141,21 @@
                 </div>
 
 
-                <div class="chat-messages" id="chatMessages">
+                <!-- CHAT MESSAGES -->
 
-                    <div class="message received">
+                <div
+                    class="chat-messages"
+                    id="chatMessages"
+                >
 
-                        <p>
-                            Hi! I'm Ananya. It's nice to connect with you.
-                        </p>
-
-                        <span>
-                            10:32 AM
-                        </span>
-
-                    </div>
-
-
-                    <div class="message received">
-
-                        <p>
-                            You can share whatever you're comfortable
-                            talking about. There's no pressure.
-                        </p>
-
-                        <span>
-                            10:33 AM
-                        </span>
-
-                    </div>
-
-
-                    <div class="message sent">
-
-                        <p>
-                            Thank you. I just wanted someone to talk to.
-                        </p>
-
-                        <span>
-                            10:35 AM
-                        </span>
-
+                    <div
+                        style="
+                            text-align:center;
+                            padding:40px;
+                            opacity:0.7;
+                        "
+                    >
+                        Select a conversation to start chatting.
                     </div>
 
                 </div>
@@ -207,7 +163,10 @@
 
                 <!-- MESSAGE INPUT -->
 
-                <form class="message-input-area" id="messageForm">
+                <form
+                    class="message-input-area"
+                    id="messageForm"
+                >
 
                     <input
                         type="text"
@@ -231,233 +190,906 @@
 
     <script>
 
-        /* LOGOUT */
+        /* =====================================================
+           BACKEND URL
+        ===================================================== */
 
-        document.getElementById("logoutBtn")
-            .addEventListener("click", function () {
-
-                localStorage.removeItem("interconnectUser");
-
-                window.location.href = "login.html";
-
-            });
+        const API_URL =
+            "https://interconnect-production-9022.up.railway.app";
 
 
-        /* CONVERSATION SWITCHING */
+        /* =====================================================
+           LOGGED-IN USER
+        ===================================================== */
 
-        const conversations =
-            document.querySelectorAll(".conversation");
-
-        const chatName =
-            document.getElementById("chatName");
-
-        const chatRole =
-            document.getElementById("chatRole");
+        const currentUser =
+            JSON.parse(
+                localStorage.getItem(
+                    "interconnectUser"
+                )
+            );
 
 
-        conversations.forEach(function(conversation) {
+        console.log(
+            "Messages page user:",
+            currentUser
+        );
 
-            conversation.addEventListener("click", function() {
 
-                conversations.forEach(function(item) {
-                    item.classList.remove("active-conversation");
-                });
-
-                conversation.classList.add("active-conversation");
-
-                const name =
-                    conversation.dataset.name;
-
-                const role =
-                    conversation.dataset.role;
-
-                chatName.textContent = name;
-
-                chatRole.textContent =
-                    "🟢 Online · " + role;
-
-            });
-
-        });
-        /* OPEN SELECTED SUPPORTER */
-
-const selectedSupporter =
-    localStorage.getItem("selectedSupporter");
-
-if (selectedSupporter) {
-
-    conversations.forEach(function(conversation) {
+        /* =====================================================
+           LOGIN CHECK
+        ===================================================== */
 
         if (
-            conversation.dataset.name ===
-            selectedSupporter
+            !currentUser ||
+            !currentUser.id
         ) {
 
-            conversation.click();
+            window.location.href =
+                "login.html";
 
         }
 
-    });
 
-}
+        /* =====================================================
+           ELEMENTS
+        ===================================================== */
+
+        const conversationList =
+            document.getElementById(
+                "conversationList"
+            );
 
 
-        /* SEND MESSAGE */
+        const conversationCount =
+            document.getElementById(
+                "conversationCount"
+            );
 
-        const messageForm =
-            document.getElementById("messageForm");
 
-        const messageInput =
-            document.getElementById("messageInput");
+        const noConversations =
+            document.getElementById(
+                "noConversations"
+            );
+
+
+        const chatName =
+            document.getElementById(
+                "chatName"
+            );
+
+
+        const chatRole =
+            document.getElementById(
+                "chatRole"
+            );
+
+
+        const chatAvatar =
+            document.getElementById(
+                "chatAvatar"
+            );
+
 
         const chatMessages =
-            document.getElementById("chatMessages");
+            document.getElementById(
+                "chatMessages"
+            );
 
 
-        /* ==============================
-   MESSAGE STORAGE
-============================== */
-
-function getMessageKey() {
-
-    const supporter =
-        localStorage.getItem("selectedSupporter")
-        || "Ananya Sharma";
-
-    return "interconnectMessages_" + supporter;
-
-}
+        const messageForm =
+            document.getElementById(
+                "messageForm"
+            );
 
 
-/* LOAD SAVED MESSAGES */
-
-function loadSavedMessages() {
-
-    const savedMessages =
-        JSON.parse(
-            localStorage.getItem(getMessageKey())
-        ) || [];
-
-    savedMessages.forEach(function(messageData) {
-
-        const message =
-            document.createElement("div");
-
-        message.className =
-            "message " + messageData.type;
-
-        message.innerHTML = `
-            <p>${messageData.text}</p>
-            <span>${messageData.time}</span>
-        `;
-
-        chatMessages.appendChild(message);
-
-    });
-
-    chatMessages.scrollTop =
-        chatMessages.scrollHeight;
-
-}
+        const messageInput =
+            document.getElementById(
+                "messageInput"
+            );
 
 
-/* SEND MESSAGE */
+        /* =====================================================
+           CURRENT CONVERSATION
+        ===================================================== */
 
-messageForm.addEventListener(
-    "submit",
-    function(event) {
-
-        event.preventDefault();
-
-        const text =
-            messageInput.value.trim();
-
-        if (!text) {
-            return;
-        }
+        let currentReceiverId = null;
 
 
-        const now =
-            new Date();
+        /* =====================================================
+           LOGOUT
+        ===================================================== */
 
-        const time =
-            now.toLocaleTimeString(
-                [],
-                {
-                    hour: "2-digit",
-                    minute: "2-digit"
+        document
+            .getElementById("logoutBtn")
+            .addEventListener(
+                "click",
+                function () {
+
+                    localStorage.removeItem(
+                        "interconnectUser"
+                    );
+
+                    localStorage.removeItem(
+                        "selectedConversationUser"
+                    );
+
+                    window.location.href =
+                        "login.html";
+
                 }
             );
 
 
-        const messageData = {
+        /* =====================================================
+           LOAD ACCEPTED CONNECTIONS
+        ===================================================== */
 
-            text: text,
+        async function loadConversations() {
 
-            type: "sent",
+            try {
 
-            time: time
+                console.log(
+                    "Loading connections for user:",
+                    currentUser.id
+                );
 
-        };
+
+                const response =
+                    await fetch(
+                        API_URL +
+                        "/connections/" +
+                        currentUser.id
+                    );
 
 
-        /* GET OLD MESSAGES */
+                const result =
+                    await response.json();
 
-        const messages =
-            JSON.parse(
-                localStorage.getItem(
-                    getMessageKey()
+
+                console.log(
+                    "Connections response:",
+                    result
+                );
+
+
+                if (
+                    !response.ok ||
+                    !result.success
+                ) {
+
+                    conversationList.innerHTML = `
+
+                        <p style="padding:20px;">
+
+                            Unable to load conversations.
+
+                            ${
+                                result.message ||
+                                "Please try again."
+                            }
+
+                        </p>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                const connections =
+                    result.connections || [];
+
+
+                /* REMOVE DUPLICATES */
+
+                const uniqueConnections = [];
+
+                const seenIds = new Set();
+
+
+                connections.forEach(
+                    function (person) {
+
+                        const id =
+                            parseInt(
+                                person.user_id
+                            );
+
+
+                        if (
+                            id &&
+                            !seenIds.has(id)
+                        ) {
+
+                            seenIds.add(id);
+
+                            uniqueConnections.push(
+                                person
+                            );
+
+                        }
+
+                    }
+                );
+
+
+                /* UPDATE COUNT */
+
+                conversationCount.textContent =
+                    uniqueConnections.length;
+
+
+                /* CLEAR LIST */
+
+                conversationList.innerHTML =
+                    "";
+
+
+                /* NO CONNECTIONS */
+
+                if (
+                    uniqueConnections.length === 0
+                ) {
+
+                    conversationList.innerHTML = `
+
+                        <p
+                            style="
+                                padding:20px;
+                                opacity:0.7;
+                            "
+                        >
+                            No accepted conversations yet.
+                        </p>
+
+                    `;
+
+                    chatName.textContent =
+                        "No conversations yet";
+
+                    chatRole.textContent =
+                        "Accept a support request to start messaging.";
+
+                    chatAvatar.textContent =
+                        "?";
+
+                    chatMessages.innerHTML = `
+
+                        <div
+                            style="
+                                text-align:center;
+                                padding:40px;
+                                opacity:0.7;
+                            "
+                        >
+                            You don't have any accepted
+                            connections yet.
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                /* =================================================
+                   CREATE CONVERSATION CARDS
+                ================================================= */
+
+                uniqueConnections.forEach(
+                    function (person) {
+
+                        const conversation =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        conversation.className =
+                            "conversation";
+
+
+                        conversation.dataset.id =
+                            person.user_id;
+
+
+                        conversation.dataset.name =
+                            person.name ||
+                            "User";
+
+
+                        conversation.dataset.role =
+                            person.role ||
+                            "InterConnect Member";
+
+
+                        const firstLetter =
+                            person.name
+                                ? person.name
+                                    .charAt(0)
+                                    .toUpperCase()
+                                : "?";
+
+
+                        conversation.innerHTML = `
+
+                            <div
+                                class="conversation-avatar"
+                            >
+                                ${firstLetter}
+                            </div>
+
+
+                            <div
+                                class="conversation-info"
+                            >
+
+                                <h3>
+                                    ${
+                                        person.name ||
+                                        "User"
+                                    }
+                                </h3>
+
+                                <p>
+                                    ${
+                                        person.role ||
+                                        "InterConnect Member"
+                                    }
+                                </p>
+
+                                <span>
+                                    Connected on InterConnect
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                class="online-dot"
+                            ></div>
+
+                        `;
+
+
+                        conversationList.appendChild(
+                            conversation
+                        );
+
+
+                        /* CLICK CONVERSATION */
+
+                        conversation.addEventListener(
+                            "click",
+                            function () {
+
+                                openConversation(
+                                    conversation
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+
+                /* =================================================
+                   OPEN SELECTED CONVERSATION
+                ================================================= */
+
+                const selectedConversation =
+                    JSON.parse(
+                        localStorage.getItem(
+                            "selectedConversationUser"
+                        )
+                    );
+
+
+                if (
+                    selectedConversation &&
+                    selectedConversation.id
+                ) {
+
+                    const matchingConversation =
+                        Array.from(
+                            conversationList
+                                .querySelectorAll(
+                                    ".conversation"
+                                )
+                        ).find(
+                            function (conversation) {
+
+                                return (
+                                    parseInt(
+                                        conversation.dataset.id
+                                    ) ===
+                                    parseInt(
+                                        selectedConversation.id
+                                    )
+                                );
+
+                            }
+                        );
+
+
+                    if (
+                        matchingConversation
+                    ) {
+
+                        openConversation(
+                            matchingConversation
+                        );
+
+                    } else {
+
+                        openConversation(
+                            conversationList
+                                .querySelector(
+                                    ".conversation"
+                                )
+                        );
+
+                    }
+
+
+                    localStorage.removeItem(
+                        "selectedConversationUser"
+                    );
+
+                } else {
+
+                    /* OPEN FIRST CONVERSATION */
+
+                    const firstConversation =
+                        conversationList
+                            .querySelector(
+                                ".conversation"
+                            );
+
+
+                    if (
+                        firstConversation
+                    ) {
+
+                        openConversation(
+                            firstConversation
+                        );
+
+                    }
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Conversation loading error:",
+                    error
+                );
+
+
+                conversationList.innerHTML = `
+
+                    <p style="padding:20px;">
+
+                        Unable to load conversations.
+
+                        Please try again.
+
+                    </p>
+
+                `;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           OPEN CONVERSATION
+        ===================================================== */
+
+        function openConversation(
+            conversation
+        ) {
+
+            if (!conversation) {
+                return;
+            }
+
+
+            /* REMOVE ACTIVE */
+
+            document
+                .querySelectorAll(
+                    ".conversation"
                 )
-            ) || [];
+                .forEach(
+                    function (item) {
+
+                        item.classList.remove(
+                            "active-conversation"
+                        );
+
+                    }
+                );
 
 
-        /* ADD NEW MESSAGE */
+            /* ADD ACTIVE */
 
-        messages.push(messageData);
+            conversation.classList.add(
+                "active-conversation"
+            );
 
 
-        /* SAVE */
+            /* GET USER ID */
 
-        localStorage.setItem(
-            getMessageKey(),
-            JSON.stringify(messages)
+            currentReceiverId =
+                parseInt(
+                    conversation.dataset.id
+                );
+
+
+            /* GET NAME */
+
+            const name =
+                conversation.dataset.name ||
+                "User";
+
+
+            /* GET ROLE */
+
+            const role =
+                conversation.dataset.role ||
+                "InterConnect Member";
+
+
+            /* UPDATE CHAT HEADER */
+
+            chatName.textContent =
+                name;
+
+
+            chatRole.textContent =
+                "🟢 Connected · " +
+                role;
+
+
+            chatAvatar.textContent =
+                name
+                    ? name
+                        .charAt(0)
+                        .toUpperCase()
+                    : "?";
+
+
+            /* LOAD MESSAGES */
+
+            loadMessages(
+                currentReceiverId
+            );
+
+        }
+
+
+        /* =====================================================
+           LOAD MESSAGES
+        ===================================================== */
+
+        async function loadMessages(
+            receiverId
+        ) {
+
+            if (!receiverId) {
+                return;
+            }
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        API_URL +
+                        "/messages/" +
+                        currentUser.id +
+                        "/" +
+                        receiverId
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                console.log(
+                    "Messages response:",
+                    result
+                );
+
+
+                if (
+                    !response.ok ||
+                    !result.success
+                ) {
+
+                    console.error(
+                        result.message ||
+                        "Unable to load messages."
+                    );
+
+                    return;
+
+                }
+
+
+                chatMessages.innerHTML =
+                    "";
+
+
+                const messages =
+                    result.messages || [];
+
+
+                /* NO MESSAGES */
+
+                if (
+                    messages.length === 0
+                ) {
+
+                    chatMessages.innerHTML = `
+
+                        <div
+                            style="
+                                text-align:center;
+                                padding:40px;
+                                opacity:0.7;
+                            "
+                        >
+                            No messages yet.
+                            Start the conversation.
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                /* DISPLAY MESSAGES */
+
+                messages.forEach(
+                    function (message) {
+
+                        const messageDiv =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        const type =
+                            parseInt(
+                                message.sender_id
+                            ) ===
+                            parseInt(
+                                currentUser.id
+                            )
+                                ? "sent"
+                                : "received";
+
+
+                        messageDiv.className =
+                            "message " + type;
+
+
+                        const date =
+                            new Date(
+                                message.created_at
+                            );
+
+
+                        const time =
+                            date.toLocaleTimeString(
+                                [],
+                                {
+                                    hour:
+                                        "2-digit",
+
+                                    minute:
+                                        "2-digit"
+                                }
+                            );
+
+
+                        const text =
+                            document.createElement(
+                                "p"
+                            );
+
+
+                        text.textContent =
+                            message.message;
+
+
+                        const timeElement =
+                            document.createElement(
+                                "span"
+                            );
+
+
+                        timeElement.textContent =
+                            time;
+
+
+                        messageDiv.appendChild(
+                            text
+                        );
+
+
+                        messageDiv.appendChild(
+                            timeElement
+                        );
+
+
+                        chatMessages.appendChild(
+                            messageDiv
+                        );
+
+                    }
+                );
+
+
+                /* SCROLL TO BOTTOM */
+
+                chatMessages.scrollTop =
+                    chatMessages.scrollHeight;
+
+            } catch (error) {
+
+                console.error(
+                    "Unable to load messages:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /* =====================================================
+           SEND MESSAGE
+        ===================================================== */
+
+        messageForm.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                const text =
+                    messageInput.value.trim();
+
+
+                if (!text) {
+                    return;
+                }
+
+
+                if (!currentReceiverId) {
+
+                    alert(
+                        "Please select a conversation first."
+                    );
+
+                    return;
+
+                }
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            API_URL +
+                            "/messages",
+                            {
+
+                                method:
+                                    "POST",
+
+                                headers: {
+
+                                    "Content-Type":
+                                        "application/json"
+
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        sender_id:
+                                            currentUser.id,
+
+                                        receiver_id:
+                                            currentReceiverId,
+
+                                        message:
+                                            text
+
+                                    })
+
+                            }
+                        );
+
+
+                    const result =
+                        await response.json();
+
+
+                    console.log(
+                        "Send message response:",
+                        result
+                    );
+
+
+                    if (
+                        !response.ok ||
+                        !result.success
+                    ) {
+
+                        alert(
+                            result.message ||
+                            "Unable to send message."
+                        );
+
+                        return;
+
+                    }
+
+
+                    /* CLEAR INPUT */
+
+                    messageInput.value =
+                        "";
+
+
+                    /* RELOAD CHAT */
+
+                    await loadMessages(
+                        currentReceiverId
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Send message error:",
+                        error
+                    );
+
+
+                    alert(
+                        "Unable to send message. Please try again."
+                    );
+
+                }
+
+            }
         );
 
 
-        /* SHOW MESSAGE */
+        /* =====================================================
+           START
+        ===================================================== */
 
-        const message =
-            document.createElement("div");
+        loadConversations();
 
-        message.className =
-            "message sent";
-
-        message.innerHTML = `
-            <p>${text}</p>
-            <span>${time}</span>
-        `;
-
-        chatMessages.appendChild(message);
-
-
-        /* CLEAR INPUT */
-
-        messageInput.value = "";
-
-
-        /* SCROLL */
-
-        chatMessages.scrollTop =
-            chatMessages.scrollHeight;
-
-    }
-);
-
-
-/* LOAD WHEN PAGE OPENS */
-
-loadSavedMessages();
     </script>
 
 </body>
+
 </html>
