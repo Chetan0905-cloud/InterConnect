@@ -2,59 +2,100 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Support Requests | InterConnect</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="style.css">
+    <title>
+        Support Requests | InterConnect
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
 
+
 <body class="dashboard-page">
+
 
     <!-- NAVBAR -->
 
     <nav class="dashboard-nav">
 
-        <a href="index.html" class="dashboard-logo">
-            <span class="logo-icon">◎</span>
+
+        <a
+            href="index.html"
+            class="dashboard-logo"
+        >
+
+            <span class="logo-icon">
+                ◎
+            </span>
+
             InterConnect
+
         </a>
+
+
 
         <div class="dashboard-nav-links">
 
-            <a href="supporter-dashboard.html">
+
+            <a
+                href="supporter-dashboard.html"
+            >
                 Dashboard
             </a>
 
-            <a href="requests.html" class="active">
+
+            <a
+                href="requests.html"
+                class="active"
+            >
                 Requests
             </a>
+
 
             <a href="messages.html">
                 Messages
             </a>
 
+
             <a href="profile.html">
                 Profile
             </a>
 
+
         </div>
 
-        <button id="logoutBtn" class="logout-btn">
+
+
+        <button
+            id="logoutBtn"
+            class="logout-btn"
+        >
             Logout
         </button>
+
 
     </nav>
 
 
-    <!-- MAIN CONTENT -->
+
+    <!-- MAIN -->
 
     <main class="dashboard-container">
 
-        <!-- WELCOME -->
 
         <section class="dashboard-welcome">
+
 
             <div>
 
@@ -62,9 +103,11 @@
                     SUPPORT REQUESTS
                 </p>
 
+
                 <h1>
                     People Looking for Support 🤝
                 </h1>
+
 
                 <p>
                     Review support requests and choose
@@ -73,14 +116,18 @@
 
             </div>
 
+
         </section>
+
 
 
         <!-- REQUESTS -->
 
         <section class="dashboard-section">
 
+
             <div class="section-heading">
+
 
                 <div>
 
@@ -88,37 +135,46 @@
                         REQUESTS
                     </p>
 
+
                     <h2>
                         Available Support Requests
                     </h2>
 
                 </div>
 
+
             </div>
+
 
 
             <div id="requestsContainer">
 
-                <p>
+                <p id="loadingMessage">
                     Loading requests...
                 </p>
 
             </div>
 
+
         </section>
+
 
     </main>
 
 
+
     <script>
 
-        /* =========================
-           GET LOGGED-IN USER
-        ========================= */
+
+        // =====================================================
+        // LOGGED-IN USER
+        // =====================================================
 
         const userData =
             JSON.parse(
-                localStorage.getItem("interconnectUser")
+                localStorage.getItem(
+                    "interconnectUser"
+                )
             );
 
 
@@ -128,35 +184,44 @@
         );
 
 
-        /* =========================
-           CHECK LOGIN
-        ========================= */
 
-        if (!userData) {
+        // =====================================================
+        // LOGIN CHECK
+        // =====================================================
 
-            window.location.href = "login.html";
+        if (
+            !userData ||
+            !userData.id
+        ) {
+
+            window.location.href =
+                "login.html";
 
         }
 
 
-        /* =========================
-           CHECK SUPPORTER
-        ========================= */
+
+        // =====================================================
+        // SUPPORTER CHECK
+        // =====================================================
 
         if (
             userData &&
             userData.role &&
-            userData.role.toLowerCase() !== "supporter"
+            userData.role.toLowerCase() !==
+                "supporter"
         ) {
 
-            window.location.href = "dashboard.html";
+            window.location.href =
+                "dashboard.html";
 
         }
 
 
-        /* =========================
-           LOGOUT
-        ========================= */
+
+        // =====================================================
+        // LOGOUT
+        // =====================================================
 
         document
             .getElementById("logoutBtn")
@@ -175,11 +240,13 @@
             );
 
 
-        /* =========================
-           LOAD SUPPORT REQUESTS
-        ========================= */
+
+        // =====================================================
+        // LOAD REQUESTS
+        // =====================================================
 
         async function loadRequests() {
+
 
             const container =
                 document.getElementById(
@@ -194,21 +261,14 @@
             `;
 
 
+
             try {
 
-                /*
-                 * Get requests for this supporter.
-                 *
-                 * Example:
-                 * supporter ID = 3
-                 *
-                 * /support-requests/3
-                 */
 
                 const response =
                     await fetch(
-                        "https://interconnect-production-9022.up.railway.app/support-requests/"
-                        + userData.id
+                        "https://interconnect-production-9022.up.railway.app/support-requests/" +
+                        userData.id
                     );
 
 
@@ -222,12 +282,14 @@
                 );
 
 
-                /* SERVER ERROR */
 
-                if (!response.ok) {
+                if (
+                    !response.ok ||
+                    !result.success
+                ) {
+
 
                     container.innerHTML = `
-
                         <div class="dashboard-card">
 
                             <div class="card-icon">
@@ -241,12 +303,11 @@
                             <p>
                                 ${
                                     result.message ||
-                                    "Something went wrong."
+                                    "Unable to load support requests."
                                 }
                             </p>
 
                         </div>
-
                     `;
 
                     return;
@@ -254,27 +315,20 @@
                 }
 
 
-                /*
-                 * Backend may return:
-                 *
-                 * { requests: [...] }
-                 *
-                 * or directly [...]
-                 */
 
                 const requests =
-                    result.requests || result;
+                    result.requests || [];
 
 
-                /* NO REQUESTS */
+
+                // No requests
 
                 if (
-                    !Array.isArray(requests) ||
                     requests.length === 0
                 ) {
 
-                    container.innerHTML = `
 
+                    container.innerHTML = `
                         <div class="dashboard-card">
 
                             <div class="card-icon">
@@ -286,12 +340,11 @@
                             </h2>
 
                             <p>
-                                There are currently no support
-                                requests available.
+                                There are currently no
+                                support requests available.
                             </p>
 
                         </div>
-
                     `;
 
                     return;
@@ -299,15 +352,18 @@
                 }
 
 
-                /* CLEAR LOADING */
 
                 container.innerHTML = "";
 
 
-                /* SHOW REQUESTS */
+
+                // =====================================================
+                // CREATE REQUEST CARDS
+                // =====================================================
 
                 requests.forEach(
                     function (request) {
+
 
                         const card =
                             document.createElement(
@@ -323,19 +379,96 @@
                             "20px";
 
 
-                        /*
-                         * Backend uses seeker_name.
-                         */
 
                         const seekerName =
                             request.seeker_name ||
-                            request.name ||
                             "Support Seeker";
+
+
+                        const message =
+                            request.message ||
+                            "Support requested.";
 
 
                         const status =
                             request.status ||
                             "Pending";
+
+
+
+                        let buttonHTML =
+                            "";
+
+
+
+                        // Only show buttons for Pending
+
+                        if (
+                            status ===
+                            "Pending"
+                        ) {
+
+
+                            buttonHTML = `
+
+                                <button
+                                    class="dashboard-btn"
+                                    onclick="acceptRequest(${request.id})"
+                                >
+                                    Accept Request →
+                                </button>
+
+
+                                <button
+                                    class="dashboard-btn"
+                                    style="margin-left:10px;"
+                                    onclick="rejectRequest(${request.id})"
+                                >
+                                    Reject
+                                </button>
+
+                            `;
+
+                        }
+
+
+                        else if (
+                            status ===
+                            "Accepted"
+                        ) {
+
+
+                            buttonHTML = `
+
+                                <p>
+                                    <strong>
+                                        ✓ Connection accepted
+                                    </strong>
+                                </p>
+
+                            `;
+
+                        }
+
+
+                        else if (
+                            status ===
+                            "Rejected"
+                        ) {
+
+
+                            buttonHTML = `
+
+                                <p>
+                                    <strong>
+                                        Request rejected
+                                    </strong>
+                                </p>
+
+                            `;
+
+                        }
+
 
 
                         card.innerHTML = `
@@ -351,43 +484,20 @@
 
 
                             <p>
-                                A support seeker has
-                                requested to connect with you.
+                                ${message}
                             </p>
 
 
                             <p>
-                                <strong>Status:</strong>
+                                <strong>
+                                    Status:
+                                </strong>
+
                                 ${status}
                             </p>
 
 
-                            ${
-                                status.toLowerCase() === "pending"
-                                ? `
-
-                                    <button
-                                        class="dashboard-btn"
-                                        onclick="
-                                            acceptRequest(
-                                                ${request.id}
-                                            )
-                                        "
-                                    >
-                                        Accept Request →
-                                    </button>
-
-                                `
-                                : `
-
-                                    <p>
-                                        <strong>
-                                            Request already processed.
-                                        </strong>
-                                    </p>
-
-                                `
-                            }
+                            ${buttonHTML}
 
                         `;
 
@@ -399,10 +509,9 @@
                     }
                 );
 
-            }
 
+            } catch (error) {
 
-            catch (error) {
 
                 console.error(
                     "Request loading error:",
@@ -411,7 +520,6 @@
 
 
                 container.innerHTML = `
-
                     <div class="dashboard-card">
 
                         <div class="card-icon">
@@ -419,16 +527,15 @@
                         </div>
 
                         <h2>
-                            Unable to Connect
+                            Unable to Load Requests
                         </h2>
 
                         <p>
-                            Unable to connect to the
-                            InterConnect server.
+                            Please make sure the server
+                            is running and try again.
                         </p>
 
                     </div>
-
                 `;
 
             }
@@ -436,44 +543,47 @@
         }
 
 
-        /* =========================
-           ACCEPT REQUEST
-        ========================= */
+
+        // =====================================================
+        // ACCEPT REQUEST
+        // =====================================================
 
         async function acceptRequest(
             requestId
         ) {
 
+
             try {
+
 
                 const response =
                     await fetch(
-
-                        "https://interconnect-production-9022.up.railway.app/support-requests/"
-                        + requestId,
-
+                        "https://interconnect-production-9022.up.railway.app/support-requests/" +
+                        requestId,
                         {
 
-                            method: "PUT",
+                            method:
+                                "PUT",
 
                             headers: {
-
                                 "Content-Type":
                                     "application/json"
-
                             },
 
                             body:
                                 JSON.stringify({
 
                                     status:
-                                        "Accepted"
+                                        "Accepted",
+
+                                    supporter_id:
+                                        userData.id
 
                                 })
 
                         }
-
                     );
+
 
 
                 const result =
@@ -486,37 +596,34 @@
                 );
 
 
-                if (response.ok) {
+
+                if (
+                    response.ok &&
+                    result.success
+                ) {
+
 
                     alert(
                         "Support request accepted!"
                     );
 
 
-                    /*
-                     * Reload the requests
-                     * after accepting.
-                     */
-
                     loadRequests();
 
-                }
 
-                else {
+                } else {
+
 
                     alert(
-
                         result.message ||
                         "Unable to accept request."
-
                     );
 
                 }
 
-            }
 
+            } catch (error) {
 
-            catch (error) {
 
                 console.error(
                     "Accept request error:",
@@ -533,13 +640,107 @@
         }
 
 
-        /* =========================
-           LOAD REQUESTS WHEN PAGE OPENS
-        ========================= */
+
+        // =====================================================
+        // REJECT REQUEST
+        // =====================================================
+
+        async function rejectRequest(
+            requestId
+        ) {
+
+
+            try {
+
+
+                const response =
+                    await fetch(
+                        "https://interconnect-production-9022.up.railway.app/support-requests/" +
+                        requestId,
+                        {
+
+                            method:
+                                "PUT",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    status:
+                                        "Rejected",
+
+                                    supporter_id:
+                                        userData.id
+
+                                })
+
+                        }
+                    );
+
+
+
+                const result =
+                    await response.json();
+
+
+
+                if (
+                    response.ok &&
+                    result.success
+                ) {
+
+
+                    alert(
+                        "Support request rejected."
+                    );
+
+
+                    loadRequests();
+
+
+                } else {
+
+
+                    alert(
+                        result.message ||
+                        "Unable to reject request."
+                    );
+
+                }
+
+
+            } catch (error) {
+
+
+                console.error(
+                    "Reject request error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to connect to the server."
+                );
+
+            }
+
+        }
+
+
+
+        // =====================================================
+        // START
+        // =====================================================
 
         loadRequests();
 
+
     </script>
+
 
 </body>
 
