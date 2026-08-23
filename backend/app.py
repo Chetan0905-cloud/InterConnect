@@ -5,9 +5,59 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import create_user
 from database import get_db_connection
 
-
 app = Flask(__name__)
 CORS(app)
+
+
+# =====================================================
+# CREATE MESSAGES TABLE IF IT DOES NOT EXIST
+# =====================================================
+
+def ensure_messages_table():
+
+    connection = get_db_connection()
+
+    if not connection:
+        print("Could not connect to database while creating messages table.")
+        return
+
+    cursor = None
+
+    try:
+
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS messages (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                sender_id INT NOT NULL,
+                receiver_id INT NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                INDEX idx_sender_receiver (sender_id, receiver_id),
+                INDEX idx_receiver_sender (receiver_id, sender_id)
+            )
+        """)
+
+        connection.commit()
+
+        print("Messages table checked successfully.")
+
+    except Exception as e:
+
+        print("MESSAGES TABLE ERROR:", e)
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        connection.close()
+
+
+# Create messages table when backend starts
+ensure_messages_table()
 
 
 # =====================================================
@@ -24,7 +74,7 @@ def signup():
     password = data.get("password")
     role = data.get("role")
 
-    # Convert frontend role to database role
+    # Convert frontend role values to MySQL role values
     if role == "seeker":
         role = "Support Seeker"
 
@@ -129,19 +179,150 @@ def login():
             }), 401
 
         return jsonify({
+
             "success": True,
+
             "message": "Login successful",
+
             "user": {
                 "id": user["id"],
                 "name": user["name"],
                 "email": user["email"],
                 "role": user["role"]
             }
+
+        }), 200
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        connection.close()
+
+
+# =====================================================
+# GET SUPPORT REQUESTS FOR A SUPPORTER
+# =====================================================
+
+@app.route("/support-requests/<int:supporter_id>", methods=["GET"])
+def get_support_requests(supporter_id):
+
+    connection = get_db_connection()
+
+    if not connection:
+
+        return jsonify({
+            "success": False,
+            "message": "Database connection failed"
+        }), 500
+
+    cursor = None
+
+    try:
+
+        cursor = connection.cursor(
+            dictionary=True,
+            buffered=True
+        )
+
+        cursor.execute("""
+            SELECT
+                support_requests.id,
+                support_requests.seeker_id,
+                support_requests.supporter_id,
+                support_requests.status,
+                support_requests.created_at,
+                users.name AS seeker_name,
+                users.email AS seeker_email
+            FROM support_requests
+            INNER JOIN users
+                ON support_requests.seeker_id = users.id
+            WHERE support_requests.supporter_id = %s
+            ORDER BY support_requests.created_at DESC
+        """, (supporter_id,))
+
+        requests = cursor.fetchall()
+
+        return jsonify({
+            "success": True,
+            "requests": requests
         }), 200
 
     except Exception as e:
 
-        print("LOGIN ERROR:", str(e))
+        return jsonify({
+            "success": False,
+            "message": str(e)
+        }), 500
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        connection.close()
+
+
+# =====================================================
+# UPDATE SUPPORT REQUEST STATUS
+# =====================================================
+
+@app.route("/support-requests/<int:request_id>", methods=["PUT"])
+def update_support_request(request_id):
+
+    data = request.get_json() or {}
+
+    status = data.get("status")
+
+    if status not in ["Accepted", "Rejected"]:
+
+        return jsonify({
+            "success": False,
+            "message": "Invalid status"
+        }), 400
+
+    connection = get_db_connection()
+
+    if not connection:
+
+        return jsonify({
+            "success": False,
+            "message": "Database connection failed"
+        }), 500
+
+    cursor = None
+
+    try:
+
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            UPDATE support_requests
+            SET status = %s
+            WHERE id = %s
+        """, (
+            status,
+            request_id
+        ))
+
+        connection.commit()
+
+        if cursor.rowcount == 0:
+
+            return jsonify({
+                "success": False,
+                "message": "Request not found"
+            }), 404
+
+        return jsonify({
+            "success": True,
+            "message": f"Request {status.lower()} successfully"
+        }), 200
+
+    except Exception as e:
+
+        connection.rollback()
 
         return jsonify({
             "success": False,
@@ -181,37 +362,24 @@ def get_supporters():
             buffered=True
         )
 
-        # IMPORTANT:
-        # Only use columns that currently exist
-        # in your Railway users table.
-
         cursor.execute("""
             SELECT
-                id,
-                name,
-                email,
-                role
+                users.id,
+                users.name,
+                users.email,
+                users.role,
+                supporter_profiles.qualification,
+                supporter_profiles.bio,
+                supporter_profiles.availability,
+                supporter_profiles.location,
+                supporter_profiles.is_verified
             FROM users
-            WHERE role = 'Supporter'
-            ORDER BY name ASC
+            INNER JOIN supporter_profiles
+                ON users.id = supporter_profiles.user_id
+            WHERE users.role = 'Supporter'
         """)
 
         supporters = cursor.fetchall()
-
-        # Your current database does not have these
-        # profile columns, so we provide safe defaults.
-        for supporter in supporters:
-
-            supporter["qualification"] = "Peer Supporter"
-
-            supporter["bio"] = (
-                "Available to provide support "
-                "and a listening ear."
-            )
-
-            supporter["location"] = "Available online"
-
-            supporter["availability"] = "Available"
 
         return jsonify({
             "success": True,
@@ -219,8 +387,6 @@ def get_supporters():
         }), 200
 
     except Exception as e:
-
-        print("GET SUPPORTERS ERROR:", str(e))
 
         return jsonify({
             "success": False,
@@ -246,21 +412,12 @@ def create_support_request():
 
     seeker_id = data.get("seeker_id")
     supporter_id = data.get("supporter_id")
-    message = data.get("message", "")
 
     if not seeker_id or not supporter_id:
 
         return jsonify({
             "success": False,
             "message": "Seeker ID and Supporter ID are required"
-        }), 400
-
-    # Prevent sending request to yourself
-    if int(seeker_id) == int(supporter_id):
-
-        return jsonify({
-            "success": False,
-            "message": "You cannot send a request to yourself"
         }), 400
 
     connection = get_db_connection()
@@ -281,50 +438,17 @@ def create_support_request():
             buffered=True
         )
 
-        # Check seeker exists
-        cursor.execute(
-            "SELECT id, role FROM users WHERE id = %s",
-            (seeker_id,)
-        )
-
-        seeker = cursor.fetchone()
-
-        if not seeker:
-
-            return jsonify({
-                "success": False,
-                "message": "Support seeker not found"
-            }), 404
-
-        # Check supporter exists
-        cursor.execute(
-            "SELECT id, role FROM users WHERE id = %s",
-            (supporter_id,)
-        )
-
-        supporter = cursor.fetchone()
-
-        if not supporter:
-
-            return jsonify({
-                "success": False,
-                "message": "Supporter not found"
-            }), 404
-
-        # Check duplicate pending request
-        cursor.execute(
-            """
+        # Check whether a pending request already exists
+        cursor.execute("""
             SELECT id, status
             FROM support_requests
             WHERE seeker_id = %s
             AND supporter_id = %s
             AND status = 'Pending'
-            """,
-            (
-                seeker_id,
-                supporter_id
-            )
-        )
+        """, (
+            seeker_id,
+            supporter_id
+        ))
 
         existing_request = cursor.fetchone()
 
@@ -335,24 +459,15 @@ def create_support_request():
                 "message": "Request already sent"
             }), 409
 
-        # Create request
-        cursor.execute(
-            """
+        # Insert new request
+        cursor.execute("""
             INSERT INTO support_requests
-            (
-                seeker_id,
-                supporter_id,
-                message,
-                status
-            )
-            VALUES (%s, %s, %s, 'Pending')
-            """,
-            (
-                seeker_id,
-                supporter_id,
-                message
-            )
-        )
+            (seeker_id, supporter_id, status)
+            VALUES (%s, %s, 'Pending')
+        """, (
+            seeker_id,
+            supporter_id
+        ))
 
         connection.commit()
 
@@ -364,208 +479,6 @@ def create_support_request():
     except Exception as e:
 
         connection.rollback()
-
-        print(
-            "CREATE SUPPORT REQUEST ERROR:",
-            str(e)
-        )
-
-        return jsonify({
-            "success": False,
-            "message": str(e)
-        }), 500
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        connection.close()
-
-
-# =====================================================
-# GET SUPPORT REQUESTS FOR SUPPORTER
-# =====================================================
-
-@app.route("/support-requests/<int:supporter_id>", methods=["GET"])
-def get_support_requests(supporter_id):
-
-    connection = get_db_connection()
-
-    if not connection:
-
-        return jsonify({
-            "success": False,
-            "message": "Database connection failed"
-        }), 500
-
-    cursor = None
-
-    try:
-
-        cursor = connection.cursor(
-            dictionary=True,
-            buffered=True
-        )
-
-        cursor.execute("""
-            SELECT
-                sr.id,
-                sr.seeker_id,
-                sr.supporter_id,
-                sr.message,
-                sr.status,
-                sr.created_at,
-                u.name AS seeker_name,
-                u.email AS seeker_email
-            FROM support_requests sr
-            INNER JOIN users u
-                ON sr.seeker_id = u.id
-            WHERE sr.supporter_id = %s
-            ORDER BY sr.created_at DESC
-        """, (supporter_id,))
-
-        requests = cursor.fetchall()
-
-        return jsonify({
-            "success": True,
-            "requests": requests
-        }), 200
-
-    except Exception as e:
-
-        print(
-            "GET SUPPORT REQUESTS ERROR:",
-            str(e)
-        )
-
-        return jsonify({
-            "success": False,
-            "message": str(e)
-        }), 500
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        connection.close()
-
-
-# =====================================================
-# UPDATE SUPPORT REQUEST STATUS
-# =====================================================
-
-@app.route(
-    "/support-requests/<int:request_id>",
-    methods=["PUT"]
-)
-def update_support_request(request_id):
-
-    data = request.get_json() or {}
-
-    status = data.get("status")
-    supporter_id = data.get("supporter_id")
-
-    if status not in ["Accepted", "Rejected"]:
-
-        return jsonify({
-            "success": False,
-            "message": "Invalid status"
-        }), 400
-
-    connection = get_db_connection()
-
-    if not connection:
-
-        return jsonify({
-            "success": False,
-            "message": "Database connection failed"
-        }), 500
-
-    cursor = None
-
-    try:
-
-        cursor = connection.cursor(
-            dictionary=True,
-            buffered=True
-        )
-
-        # If supporter ID was supplied, make sure
-        # this request belongs to that supporter.
-        if supporter_id:
-
-            cursor.execute(
-                """
-                SELECT id
-                FROM support_requests
-                WHERE id = %s
-                AND supporter_id = %s
-                """,
-                (
-                    request_id,
-                    supporter_id
-                )
-            )
-
-            request_exists = cursor.fetchone()
-
-            if not request_exists:
-
-                return jsonify({
-                    "success": False,
-                    "message": "Request not found"
-                }), 404
-
-        else:
-
-            cursor.execute(
-                """
-                SELECT id
-                FROM support_requests
-                WHERE id = %s
-                """,
-                (request_id,)
-            )
-
-            request_exists = cursor.fetchone()
-
-            if not request_exists:
-
-                return jsonify({
-                    "success": False,
-                    "message": "Request not found"
-                }), 404
-
-        cursor.execute(
-            """
-            UPDATE support_requests
-            SET status = %s
-            WHERE id = %s
-            """,
-            (
-                status,
-                request_id
-            )
-        )
-
-        connection.commit()
-
-        return jsonify({
-            "success": True,
-            "message":
-                f"Request {status.lower()} successfully"
-        }), 200
-
-    except Exception as e:
-
-        connection.rollback()
-
-        print(
-            "UPDATE SUPPORT REQUEST ERROR:",
-            str(e)
-        )
 
         return jsonify({
             "success": False,
@@ -597,8 +510,7 @@ def send_message():
 
         return jsonify({
             "success": False,
-            "message":
-                "Sender, receiver and message are required"
+            "message": "Sender, receiver and message are required"
         }), 400
 
     connection = get_db_connection()
@@ -619,9 +531,11 @@ def send_message():
             buffered=True
         )
 
-        # Messaging only after Accepted connection
-        cursor.execute(
-            """
+        # =================================================
+        # MAKE SURE USERS ARE CONNECTED
+        # =================================================
+
+        cursor.execute("""
             SELECT id
             FROM support_requests
             WHERE
@@ -636,14 +550,12 @@ def send_message():
                     AND supporter_id = %s
                     AND status = 'Accepted'
                 )
-            """,
-            (
-                sender_id,
-                receiver_id,
-                receiver_id,
-                sender_id
-            )
-        )
+        """, (
+            sender_id,
+            receiver_id,
+            receiver_id,
+            sender_id
+        ))
 
         connection_check = cursor.fetchone()
 
@@ -652,25 +564,22 @@ def send_message():
             return jsonify({
                 "success": False,
                 "message":
-                    "Messaging is available after the support request is accepted."
+                "Messaging is available after the support request is accepted."
             }), 403
 
-        cursor.execute(
-            """
+        # =================================================
+        # INSERT MESSAGE
+        # =================================================
+
+        cursor.execute("""
             INSERT INTO messages
-            (
-                sender_id,
-                receiver_id,
-                message
-            )
+            (sender_id, receiver_id, message)
             VALUES (%s, %s, %s)
-            """,
-            (
-                sender_id,
-                receiver_id,
-                message
-            )
-        )
+        """, (
+            sender_id,
+            receiver_id,
+            message
+        ))
 
         connection.commit()
 
@@ -734,10 +643,13 @@ def get_messages(user1_id, user2_id):
                 sender.name AS sender_name,
                 receiver.name AS receiver_name
             FROM messages
+
             INNER JOIN users AS sender
                 ON messages.sender_id = sender.id
+
             INNER JOIN users AS receiver
                 ON messages.receiver_id = receiver.id
+
             WHERE
                 (
                     messages.sender_id = %s
@@ -748,6 +660,7 @@ def get_messages(user1_id, user2_id):
                     messages.sender_id = %s
                     AND messages.receiver_id = %s
                 )
+
             ORDER BY messages.created_at ASC
         """, (
             user1_id,
@@ -782,10 +695,7 @@ def get_messages(user1_id, user2_id):
 # GET ACCEPTED CONNECTIONS
 # =====================================================
 
-@app.route(
-    "/connections/<int:user_id>",
-    methods=["GET"]
-)
+@app.route("/connections/<int:user_id>", methods=["GET"])
 def get_connections(user_id):
 
     connection = get_db_connection()
@@ -808,7 +718,6 @@ def get_connections(user_id):
 
         cursor.execute("""
             SELECT
-
                 sr.id AS request_id,
 
                 CASE
@@ -861,199 +770,6 @@ def get_connections(user_id):
         }), 200
 
     except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "message": str(e)
-        }), 500
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        connection.close()
-
-
-# =====================================================
-# GET PROFILE
-# =====================================================
-
-@app.route(
-    "/profile/<int:user_id>",
-    methods=["GET"]
-)
-def get_profile(user_id):
-
-    connection = get_db_connection()
-
-    if not connection:
-
-        return jsonify({
-            "success": False,
-            "message": "Database connection failed"
-        }), 500
-
-    cursor = None
-
-    try:
-
-        cursor = connection.cursor(
-            dictionary=True,
-            buffered=True
-        )
-
-        # Current users table only contains
-        # these fields.
-        cursor.execute("""
-            SELECT
-                id,
-                name,
-                email,
-                role
-            FROM users
-            WHERE id = %s
-        """, (user_id,))
-
-        user = cursor.fetchone()
-
-        if not user:
-
-            return jsonify({
-                "success": False,
-                "message": "User not found"
-            }), 404
-
-        # Default profile fields
-        user["age"] = None
-        user["location"] = ""
-        user["interests"] = ""
-        user["qualification"] = ""
-        user["college"] = ""
-        user["bio"] = ""
-        user["availability"] = "Available"
-
-        return jsonify({
-            "success": True,
-            "user": user
-        }), 200
-
-    except Exception as e:
-
-        return jsonify({
-            "success": False,
-            "message": str(e)
-        }), 500
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        connection.close()
-
-
-# =====================================================
-# UPDATE PROFILE
-# =====================================================
-
-@app.route(
-    "/profile/<int:user_id>",
-    methods=["PUT"]
-)
-def update_profile(user_id):
-
-    data = request.get_json() or {}
-
-    name = data.get("name")
-
-    if not name or not name.strip():
-
-        return jsonify({
-            "success": False,
-            "message": "Name is required"
-        }), 400
-
-    connection = get_db_connection()
-
-    if not connection:
-
-        return jsonify({
-            "success": False,
-            "message": "Database connection failed"
-        }), 500
-
-    cursor = None
-
-    try:
-
-        cursor = connection.cursor(
-            dictionary=True,
-            buffered=True
-        )
-
-        cursor.execute(
-            "SELECT id FROM users WHERE id = %s",
-            (user_id,)
-        )
-
-        existing_user = cursor.fetchone()
-
-        if not existing_user:
-
-            return jsonify({
-                "success": False,
-                "message": "User not found"
-            }), 404
-
-        # Only update the column that currently exists
-        # and is safe to update.
-        cursor.execute(
-            """
-            UPDATE users
-            SET name = %s
-            WHERE id = %s
-            """,
-            (
-                name.strip(),
-                user_id
-            )
-        )
-
-        connection.commit()
-
-        cursor.execute(
-            """
-            SELECT
-                id,
-                name,
-                email,
-                role
-            FROM users
-            WHERE id = %s
-            """,
-            (user_id,)
-        )
-
-        updated_user = cursor.fetchone()
-
-        updated_user["age"] = None
-        updated_user["location"] = ""
-        updated_user["interests"] = ""
-        updated_user["qualification"] = ""
-        updated_user["college"] = ""
-        updated_user["bio"] = ""
-        updated_user["availability"] = "Available"
-
-        return jsonify({
-            "success": True,
-            "message": "Profile updated successfully",
-            "user": updated_user
-        }), 200
-
-    except Exception as e:
-
-        connection.rollback()
 
         return jsonify({
             "success": False,
