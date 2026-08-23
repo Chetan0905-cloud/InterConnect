@@ -106,7 +106,7 @@ document.getElementById("seekerForm").addEventListener("submit", async function 
 
     try {
 
-        const response = await fetch("http://127.0.0.1:5000/signup", {
+        const response = await fetch("https://interconnect-production-9022.up.railway.app/signup", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
